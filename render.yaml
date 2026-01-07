@@ -1,3 +1,7 @@
+runtime: python
+build:
+  pythonVersion: 3.11.0
+
 services:
   - type: web
     name: samay-news-tracker
