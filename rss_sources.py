@@ -15,6 +15,7 @@ ENGLISH_SOURCES = {
             'india': 'https://www.thehindu.com/news/national/feeder/default.rss'
         }
     },
+    """
     'indian_express': {
         'name': 'Indian Express',
         'feeds': {
@@ -96,6 +97,7 @@ ENGLISH_SOURCES = {
             'national': 'https://www.outlookindia.com/rss/national'
         }
     }
+    """
 }
 
 # ============== HINDI NEWS SOURCES ==============
@@ -107,6 +109,7 @@ HINDI_SOURCES = {
             'international': 'https://feeds.bbci.co.uk/hindi/international/rss.xml'
         }
     },
+    """
     'navbharat_times': {
         'name': 'नवभारत टाइम्स',
         'feeds': {
@@ -137,6 +140,7 @@ HINDI_SOURCES = {
             'national': 'https://www.naidunia.com/rss/national-news'
         }
     }
+    """
 }
 
 # ============== CATEGORY-SPECIFIC SPECIALIZED SOURCES ==============
@@ -151,6 +155,7 @@ SPECIALIZED_SOURCES = {
                 'pollution': 'https://www.downtoearth.org.in/rss/air'
             }
         },
+        """
         'mongabay_india': {
             'name': 'Mongabay India',
             'feeds': {
@@ -169,6 +174,7 @@ SPECIALIZED_SOURCES = {
                 'india': 'https://www.climatechangenews.com/tag/india/feed/'
             }
         }
+        """
     },
     
     # महिला सशक्तिकरण
@@ -186,7 +192,7 @@ SPECIALIZED_SOURCES = {
             }
         }
     },
-    
+    """
     # शिक्षा व युवा
     'education_youth': {
         'the_better_india_education': {
@@ -228,6 +234,7 @@ SPECIALIZED_SOURCES = {
             }
         }
     }
+    """
 }
 
 # ============== RSS FEED TO CATEGORY MAPPING ==============
