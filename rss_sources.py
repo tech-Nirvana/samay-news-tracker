@@ -23,6 +23,7 @@ ENGLISH_SOURCES = {
             'cities': 'https://indianexpress.com/section/cities/feed/'
         }
     },
+    """
     'the_wire': {
         'name': 'The Wire',
         'feeds': {
