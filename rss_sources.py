@@ -15,15 +15,15 @@ ENGLISH_SOURCES = {
             'india': 'https://www.thehindu.com/news/national/feeder/default.rss'
         }
     },
-    """
     'indian_express': {
         'name': 'Indian Express',
         'feeds': {
             'india': 'https://indianexpress.com/section/india/feed/',
             'cities': 'https://indianexpress.com/section/cities/feed/'
         }
-    },
+    }
     """
+    ,
     'the_wire': {
         'name': 'The Wire',
         'feeds': {
@@ -110,13 +110,14 @@ HINDI_SOURCES = {
             'international': 'https://feeds.bbci.co.uk/hindi/international/rss.xml'
         }
     },
-    """
     'navbharat_times': {
         'name': 'नवभारत टाइम्स',
         'feeds': {
             'india': 'https://navbharattimes.indiatimes.com/rssfeedstopstories.cms'
         }
-    },
+    }
+    """
+    ,
     'dainik_jagran': {
         'name': 'दैनिक जागरण',
         'feeds': {
@@ -156,13 +157,14 @@ SPECIALIZED_SOURCES = {
                 'pollution': 'https://www.downtoearth.org.in/rss/air'
             }
         },
-        """
         'mongabay_india': {
             'name': 'Mongabay India',
             'feeds': {
                 'all': 'https://india.mongabay.com/feed/'
             }
-        },
+        }
+        """
+        ,
         'india_climate_dialogue': {
             'name': 'India Climate Dialogue',
             'feeds': {
@@ -192,8 +194,9 @@ SPECIALIZED_SOURCES = {
                 'news': 'https://www.shethepeople.tv/rss'
             }
         }
-    },
+    }
     """
+    ,
     # शिक्षा व युवा
     'education_youth': {
         'the_better_india_education': {
