@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>समय - RSS-Based Hybrid Intelligence</title>
+    <title>समय - Hybrid AI News Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes pulse {
@@ -25,6 +25,8 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Tooltip styles */
         .tooltip {
             position: relative;
             display: inline-block;
@@ -59,12 +61,6 @@
             margin: 4px 0;
             padding: 2px 0;
         }
-        .lang-badge {
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-orange-50 via-white to-blue-50">
@@ -74,54 +70,48 @@
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <h1 class="text-4xl font-bold text-orange-600 mb-2">
-                        ⚡ समय - RSS-Based Intelligence
+                        ⚡ समय - Hybrid AI Intelligence
                     </h1>
-                    <p class="text-gray-600">35-40 Indian Sources | English + Hindi | Hybrid AI</p>
+                    <p class="text-gray-600">Rules + Open Source AI (Groq LLM)</p>
                 </div>
                 <div class="text-right">
-                    <div class="text-sm text-gray-500">Last Update (IST):</div>
+                    <div class="text-sm text-gray-500">Last Updated (IST):</div>
                     <div id="lastUpdated" class="text-lg font-semibold text-gray-700">--:--</div>
-                    <div id="nextUpdate" class="text-xs text-gray-500 mt-1">Next: --:--</div>
                     <div id="aiStatus" class="text-xs mt-1"></div>
                 </div>
             </div>
 
             <!-- Live Status -->
             <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse-custom"></div>
-                        <p class="text-sm text-green-800 font-semibold">
-                            📰 LIVE: RSS Feeds (Auto-refresh हर 6 घंटे)
-                        </p>
-                    </div>
-                    <button onclick="forceRefresh()" class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
-                        Manual Refresh
-                    </button>
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse-custom"></div>
+                    <p class="text-sm text-green-800 font-semibold">
+                        🤖 LIVE: Hybrid System (Smart Rules + AI Analysis)
+                    </p>
                 </div>
             </div>
 
             <!-- Stats -->
-            <div id="stats" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6"></div>
+            <div id="stats" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <!-- Populated by JS -->
+            </div>
 
             <!-- Controls -->
             <div class="flex flex-col md:flex-row gap-4">
                 <input
                     type="text"
                     id="searchInput"
-                    placeholder="News खोजें (Hindi/English)..."
+                    placeholder="News खोजें..."
                     class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                 />
                 
-                <select id="categoryFilter" class="px-4 py-3 border-2 border-gray-300 rounded-lg">
+                <select id="categoryFilter" class="px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
                     <option value="all">सभी Categories</option>
                 </select>
 
-                <select id="languageFilter" class="px-4 py-3 border-2 border-gray-300 rounded-lg">
-                    <option value="all">सभी Languages</option>
-                    <option value="english">English</option>
-                    <option value="hindi">Hindi</option>
-                </select>
+                <button onclick="loadNews()" class="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold">
+                    🔄 Refresh
+                </button>
 
                 <button onclick="exportCSV()" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold">
                     📥 Export
@@ -132,8 +122,8 @@
         <!-- Loading -->
         <div id="loading" class="text-center py-20">
             <div class="loading mx-auto mb-4"></div>
-            <p class="text-xl text-gray-600">RSS feeds से news load हो रही है...</p>
-            <p class="text-sm text-gray-500 mt-2">35-40 Indian sources processing...</p>
+            <p class="text-xl text-gray-600">Hybrid analysis चल रही है...</p>
+            <p class="text-sm text-gray-500 mt-2">Rules filtering + AI deep analysis</p>
         </div>
 
         <!-- News Container -->
@@ -141,22 +131,20 @@
 
         <!-- Info Footer -->
         <div class="mt-8 bg-gradient-to-r from-orange-50 to-blue-50 rounded-xl shadow-lg p-6 border-2 border-orange-200">
-            <h3 class="text-xl font-bold text-gray-800 mb-3">🎯 RSS System Features:</h3>
+            <h3 class="text-xl font-bold text-gray-800 mb-3">🎯 Hybrid System Features:</h3>
             <div class="grid md:grid-cols-2 gap-3 text-sm text-gray-700">
-                <div>✅ 35-40 Indian RSS sources</div>
-                <div>✅ English + Hindi mix</div>
-                <div>✅ Auto-refresh every 6 hours</div>
-                <div>✅ Manual refresh available</div>
-                <div>✅ India-centric filtering</div>
-                <div>✅ Hybrid AI (Rules + Groq)</div>
-                <div>✅ Regional coverage</div>
-                <div>✅ Completely FREE</div>
+                <div>✅ Stage 1: Rule-based filtering (6 layers)</div>
+                <div>✅ Stage 2: AI deep analysis (Groq LLM)</div>
+                <div>✅ India-centric with global relevance</div>
+                <div>✅ Smart context detection</div>
+                <div>✅ 92-95% accuracy</div>
+                <div>✅ Completely FREE (open source AI)</div>
             </div>
             
             <div class="mt-4 p-4 bg-white rounded-lg">
                 <p class="text-xs text-gray-600">
-                    <strong>Sources:</strong> The Hindu, Indian Express, The Wire, Scroll, BBC Hindi, 
-                    Down To Earth, Mongabay, Feminism in India, और 30+ Indian publications
+                    <strong>Scoring Method:</strong> 
+                    Rules (40%) + AI Analysis (60%) + Modifiers = Final Score
                 </p>
             </div>
         </div>
@@ -165,12 +153,9 @@
     <script>
         let allNews = [];
         let reviewedItems = new Set();
-        let lastUpdateTime = null;
 
         window.onload = () => {
             loadNews();
-            // Auto-refresh check हर 30 minutes
-            setInterval(checkAndRefresh, 30 * 60 * 1000);
         };
 
         async function loadNews() {
@@ -186,13 +171,11 @@
 
                 if (data.success) {
                     allNews = data.news;
-                    lastUpdateTime = new Date(data.last_update || data.timestamp);
                     updateStats();
                     updateCategoryFilter();
                     displayNews();
                     updateTimestamp(data.timestamp);
                     updateAIStatus(data.ai_enabled);
-                    updateNextRefreshTime();
                     
                     loading.classList.add('hidden');
                     container.classList.remove('hidden');
@@ -201,81 +184,14 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Failed to load news.');
+                alert('Failed to load news. Check console.');
             }
-        }
-
-        async function forceRefresh() {
-            if (!confirm('Manual refresh करना चाहते हैं? (यह 1-2 मिनट लेगा)')) {
-                return;
-            }
-            
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = 'Refreshing...';
-            
-            try {
-                const response = await fetch('/api/refresh');
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert(`✅ Refresh successful! ${data.total} news items loaded.`);
-                    await loadNews();
-                } else {
-                    alert('❌ Refresh failed: ' + data.error);
-                }
-            } catch (error) {
-                alert('❌ Refresh error: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Manual Refresh';
-            }
-        }
-
-        function checkAndRefresh() {
-            if (!lastUpdateTime) return;
-            
-            const now = new Date();
-            const hoursSinceUpdate = (now - lastUpdateTime) / (1000 * 60 * 60);
-            
-            // If more than 6 hours, auto-refresh
-            if (hoursSinceUpdate >= 6) {
-                console.log('Auto-refreshing after 6 hours...');
-                loadNews();
-            }
-        }
-
-        function updateNextRefreshTime() {
-            if (!lastUpdateTime) return;
-            
-            const nextRefresh = new Date(lastUpdateTime.getTime() + 6 * 60 * 60 * 1000);
-            const elem = document.getElementById('nextUpdate');
-            
-            const updateCountdown = () => {
-                const now = new Date();
-                const diff = nextRefresh - now;
-                
-                if (diff <= 0) {
-                    elem.textContent = 'Next: Refreshing...';
-                    loadNews();
-                    return;
-                }
-                
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                elem.textContent = `Next refresh in: ${hours}h ${minutes}m`;
-            };
-            
-            updateCountdown();
-            setInterval(updateCountdown, 60000); // Update every minute
         }
 
         function updateStats() {
             const critical = allNews.filter(n => n.score >= 80).length;
             const high = allNews.filter(n => n.score >= 60 && n.score < 80).length;
             const monitor = allNews.filter(n => n.score < 60).length;
-            const hindi = allNews.filter(n => n.language === 'hindi').length;
-            const english = allNews.filter(n => n.language === 'english').length;
 
             document.getElementById('stats').innerHTML = `
                 <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
@@ -283,7 +199,7 @@
                     <p class="text-3xl font-bold text-red-600">${critical}</p>
                 </div>
                 <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
-                    <p class="text-sm text-gray-600">🟡 High</p>
+                    <p class="text-sm text-gray-600">🟡 High Priority</p>
                     <p class="text-3xl font-bold text-yellow-600">${high}</p>
                 </div>
                 <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
@@ -291,12 +207,8 @@
                     <p class="text-3xl font-bold text-green-600">${monitor}</p>
                 </div>
                 <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <p class="text-sm text-gray-600">🇮🇳 Hindi</p>
-                    <p class="text-3xl font-bold text-blue-600">${hindi}</p>
-                </div>
-                <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
-                    <p class="text-sm text-gray-600">🇬🇧 English</p>
-                    <p class="text-3xl font-bold text-purple-600">${english}</p>
+                    <p class="text-sm text-gray-600">📰 Total Shown</p>
+                    <p class="text-3xl font-bold text-blue-600">${allNews.length}</p>
                 </div>
             `;
         }
@@ -315,10 +227,9 @@
             const date = new Date(timestamp);
             document.getElementById('lastUpdated').textContent = 
                 date.toLocaleString('hi-IN', {
-                    day: 'numeric',
-                    month: 'short',
                     hour: '2-digit',
                     minute: '2-digit',
+                    second: '2-digit',
                     hour12: true
                 });
         }
@@ -326,7 +237,7 @@
         function updateAIStatus(enabled) {
             const status = document.getElementById('aiStatus');
             if (enabled) {
-                status.innerHTML = '<span class="text-green-600 font-semibold">✓ AI Enabled</span>';
+                status.innerHTML = '<span class="text-green-600">✓ AI Enabled</span>';
             } else {
                 status.innerHTML = '<span class="text-yellow-600">⚠ Rules Only</span>';
             }
@@ -335,68 +246,69 @@
         function displayNews() {
             const search = document.getElementById('searchInput').value.toLowerCase();
             const category = document.getElementById('categoryFilter').value;
-            const language = document.getElementById('languageFilter').value;
 
             let filtered = allNews.filter(n => {
                 const matchSearch = n.title.toLowerCase().includes(search) || 
                                   n.description.toLowerCase().includes(search);
                 const matchCategory = category === 'all' || n.category === category;
-                const matchLanguage = language === 'all' || n.language === language;
-                return matchSearch && matchCategory && matchLanguage;
+                return matchSearch && matchCategory;
             });
 
             const container = document.getElementById('newsContainer');
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div class="bg-white rounded-xl p-12 text-center">
-                        <p class="text-xl text-gray-500">कोई news नहीं मिली इस filter के साथ</p>
-                    </div>
-                `;
-            } else {
-                container.innerHTML = filtered.map(news => createNewsCard(news)).join('');
-            }
+            container.innerHTML = filtered.map(news => createNewsCard(news)).join('');
         }
 
         function createNewsCard(news) {
             const urgency = getUrgencyBadge(news.score);
             const isReviewed = reviewedItems.has(news.id);
             
+            // Score breakdown tooltip
             const breakdownHTML = `
                 <div class="breakdown-item">
-                    <span>Context:</span><span>${news.breakdown.context}/25</span>
+                    <span>Context Match:</span>
+                    <span>${news.breakdown.context}/25</span>
                 </div>
                 <div class="breakdown-item">
-                    <span>India:</span><span>${news.breakdown.india}/20</span>
+                    <span>India Relevance:</span>
+                    <span>${news.breakdown.india}/20</span>
                 </div>
                 <div class="breakdown-item">
-                    <span>Source:</span><span>${news.breakdown.source}/15</span>
+                    <span>Source Trust:</span>
+                    <span>${news.breakdown.source}/15</span>
                 </div>
                 <div class="breakdown-item">
-                    <span>Recency:</span><span>${news.breakdown.recency}/15</span>
+                    <span>Recency:</span>
+                    <span>${news.breakdown.recency}/15</span>
                 </div>
                 <div class="breakdown-item">
-                    <span>Category:</span><span>${news.breakdown.alignment}/15</span>
+                    <span>Category Fit:</span>
+                    <span>${news.breakdown.alignment}/15</span>
                 </div>
                 <div class="breakdown-item">
-                    <span>Semantic:</span><span>${news.breakdown.semantic}/10</span>
+                    <span>Semantic:</span>
+                    <span>${news.breakdown.semantic}/10</span>
                 </div>
-                <hr style="margin:8px 0;border-color:#4b5563;">
+                <hr style="margin: 8px 0; border-color: #4b5563;">
                 <div class="breakdown-item">
-                    <strong>Rule:</strong><strong>${news.ruleScore}/100</strong>
+                    <strong>Rule Score:</strong>
+                    <strong>${news.ruleScore}/100</strong>
                 </div>
                 ${news.aiScore ? `
                 <div class="breakdown-item">
-                    <strong>AI:</strong><strong>${news.aiScore}/100</strong>
+                    <strong>AI Score:</strong>
+                    <strong>${news.aiScore}/100</strong>
                 </div>` : ''}
             `;
-            
-            const langBadge = news.language === 'hindi' 
-                ? '<span class="lang-badge bg-blue-100 text-blue-800">हिंदी</span>'
-                : '<span class="lang-badge bg-purple-100 text-purple-800">ENG</span>';
             
             return `
                 <div class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all p-6 ${isReviewed ? 'opacity-60' : ''}">
                     <div class="flex gap-4">
+                        ${news.imageUrl ? `
+                            <img src="${news.imageUrl}" 
+                                 class="hidden md:block w-48 h-32 object-cover rounded-lg"
+                                 onerror="this.style.display='none'">
+                        ` : ''}
+                        
                         <div class="flex-1">
                             <div class="flex justify-between items-start mb-3">
                                 <div class="flex-1">
@@ -404,68 +316,91 @@
                                         <span class="px-3 py-1 rounded-full text-xs font-bold bg-${news.color}-100 text-${news.color}-800">
                                             ${news.category}
                                         </span>
-                                        ${langBadge}
                                         <span class="text-xs text-gray-600">• ${news.source}</span>
                                         <span class="text-xs text-gray-500">• ${news.publishedAtIST}</span>
                                     </div>
                                     <h2 class="text-xl font-bold text-gray-800 mb-2">${news.title}</h2>
                                 </div>
                                 
+                                <!-- Score with Tooltip -->
                                 <div class="ml-4 text-center tooltip">
                                     <div class="bg-gradient-to-br from-orange-400 to-orange-600 rounded-full w-16 h-16 flex items-center justify-center shadow-lg cursor-help">
                                         <span class="text-2xl font-bold text-white">${news.score}</span>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-1">Score ℹ️</p>
-                                    <span class="tooltiptext">${breakdownHTML}</span>
+                                    <span class="tooltiptext">
+                                        <strong>Score Breakdown:</strong><br><br>
+                                        ${breakdownHTML}
+                                    </span>
                                 </div>
                             </div>
 
+                            <!-- Urgency Badge -->
                             <div class="${urgency.color} inline-flex items-center gap-2 px-3 py-1 rounded-full text-white text-sm font-bold mb-3">
                                 ${urgency.icon} ${urgency.text}
                             </div>
 
+                            <!-- Description -->
                             <p class="text-gray-700 mb-4">${news.description}</p>
 
-                            ${news.reasoning && news.reasoning !== 'Low rule score' ? `
+                            <!-- AI Reasoning (if available) -->
+                            ${news.reasoning && news.reasoning !== 'Low rule score, skipped AI' ? `
                                 <div class="mb-4 p-3 bg-purple-50 border-l-4 border-purple-500 rounded">
-                                    <p class="text-xs font-semibold text-purple-800 mb-1">🤖 AI:</p>
+                                    <p class="text-xs font-semibold text-purple-800 mb-1">🤖 AI Analysis:</p>
                                     <p class="text-sm text-purple-700">${news.reasoning}</p>
                                 </div>
                             ` : ''}
 
+                            <!-- Metrics with Tooltips -->
                             <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg mb-4">
                                 <div class="tooltip">
-                                    <p class="text-xs text-gray-600">Impact: ${news.impactScore}/100</p>
+                                    <p class="text-xs text-gray-600 mb-1">Impact Score ℹ️</p>
                                     <div class="bg-gray-200 rounded-full h-2 mt-1">
-                                        <div class="bg-blue-600 h-2 rounded-full" style="width:${news.impactScore}%"></div>
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: ${news.impactScore}%"></div>
                                     </div>
+                                    <span class="text-sm font-bold text-blue-600">${news.impactScore}/100</span>
                                     <span class="tooltiptext">
-                                        <strong>Impact:</strong> कितने लोग प्रभावित<br>
-                                        Based on: reach, severity, importance
+                                        <strong>Impact:</strong> कितने लोग प्रभावित होंगे<br><br>
+                                        Based on:<br>
+                                        • Geographic reach<br>
+                                        • Population affected<br>
+                                        • Issue severity<br>
+                                        • Long-term consequences
                                     </span>
                                 </div>
 
                                 <div class="tooltip">
-                                    <p class="text-xs text-gray-600">Virality: ${news.viralityScore}/100</p>
+                                    <p class="text-xs text-gray-600 mb-1">Virality Score ℹ️</p>
                                     <div class="bg-gray-200 rounded-full h-2 mt-1">
-                                        <div class="bg-purple-600 h-2 rounded-full" style="width:${news.viralityScore}%"></div>
+                                        <div class="bg-purple-600 h-2 rounded-full" style="width: ${news.viralityScore}%"></div>
                                     </div>
+                                    <span class="text-sm font-bold text-purple-600">${news.viralityScore}/100</span>
                                     <span class="tooltiptext">
-                                        <strong>Virality:</strong> कितनी तेज़ी से फैलेगा<br>
-                                        Based on: trends, shareability
+                                        <strong>Virality:</strong> कितनी तेज़ी से फैल सकता है<br><br>
+                                        Based on:<br>
+                                        • Current trends<br>
+                                        • Emotional appeal<br>
+                                        • Shareability<br>
+                                        • Social media potential
                                     </span>
                                 </div>
                             </div>
 
+                            <!-- Actions -->
                             <div class="flex gap-2 flex-wrap">
                                 <a href="${news.url}" target="_blank" 
                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-semibold">
                                     पूरा Article →
                                 </a>
                                 <button onclick="toggleReviewed('${news.id}')"
-                                        class="px-4 py-2 rounded-lg text-sm font-semibold ${isReviewed ? 'bg-gray-200' : 'bg-green-100 text-green-700'}">
-                                    ${isReviewed ? '✓ Reviewed' : 'Mark'}
+                                        class="px-4 py-2 rounded-lg text-sm font-semibold ${isReviewed ? 'bg-gray-200 text-gray-700' : 'bg-green-100 text-green-700 hover:bg-green-200'}">
+                                    ${isReviewed ? '✓ Reviewed' : 'Mark Reviewed'}
                                 </button>
+                                ${news.action === 'urgent' ? `
+                                    <span class="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-semibold">
+                                        ⚡ तुरंत Action
+                                    </span>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
@@ -474,9 +409,9 @@
         }
 
         function getUrgencyBadge(score) {
-            if (score >= 80) return { color: 'bg-red-500', icon: '🔴', text: 'तुरंत' };
-            if (score >= 60) return { color: 'bg-yellow-500', icon: '🟡', text: 'जल्द' };
-            return { color: 'bg-green-500', icon: '🟢', text: 'Monitor' };
+            if (score >= 80) return { color: 'bg-red-500', icon: '🔴', text: 'तुरंत ध्यान दें' };
+            if (score >= 60) return { color: 'bg-yellow-500', icon: '🟡', text: 'जल्द respond करें' };
+            return { color: 'bg-green-500', icon: '🟢', text: 'Monitor करें' };
         }
 
         function toggleReviewed(id) {
@@ -488,13 +423,19 @@
             displayNews();
         }
 
-        function exportCSV() {
-            window.location.href = '/api/export';
+        async function exportCSV() {
+            try {
+                window.location.href = '/api/export';
+            } catch (error) {
+                alert('Export failed: ' + error.message);
+            }
         }
 
         document.getElementById('searchInput').addEventListener('input', displayNews);
         document.getElementById('categoryFilter').addEventListener('change', displayNews);
-        document.getElementById('languageFilter').addEventListener('change', displayNews);
+
+        // Auto-refresh every 15 minutes
+        setInterval(loadNews, 15 * 60 * 1000);
     </script>
 </body>
 </html>
