@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nirvana Read - News Curated for You</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Nirvana Read Custom Theme */
+        :root {
+            --primary: #7c3aed;
+            --secondary: #fbbf24;
+            --accent: #ff9933;
+            --bg: #f9fafb;
+            --card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(124,58,237,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .score-badge {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(124,58,237,0.3);
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+            .mobile-hide { display: none; }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div>
+                    <h1 class="text-3xl font-bold gradient-text flex items-center gap-2">
+                        <span class="text-4xl">🕉️</span>
+                        <span id="mainTitle">Nirvana Read</span>
+                    </h1>
+                    <p class="text-sm text-gray-600 mt-1" id="subtitle">News curated for you</p>
+                </div>
+                
+                <!-- Language Toggle -->
+                <button onclick="toggleLanguage()" class="px-4 py-2 rounded-lg border-2 border-purple-200 hover:bg-purple-50 transition-colors">
+                    <span id="langToggle">हिंदी</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-6xl mx-auto px-4 py-6">
+        
+        <!-- Filters & Search -->
+        <div class="card p-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <!-- Search -->
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    placeholder="Search news..."
+                    class="col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+                
+                <!-- Category Filter -->
+                <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    <option value="all">All Categories</option>
+                </select>
+                
+                <!-- Language Filter -->
+                <select id="languageFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    <option value="all">All Languages</option>
+                    <option value="english">English</option>
+                    <option value="hindi">Hindi</option>
+                </select>
+            </div>
+            
+            <!-- Info Bar -->
+            <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                <div class="flex items-center gap-4 text-sm text-gray-600">
+                    <span>📰 <strong id="newsCount">0</strong> news</span>
+                    <span class="mobile-hide">⏰ Updated: <strong id="lastUpdate">--:--</strong></span>
+                </div>
+                
+                <button onclick="refreshNews()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-semibold">
+                    🔄 <span id="refreshBtn">Refresh</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="text-center py-20">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-600" id="loadingText">Loading curated news...</p>
+        </div>
+
+        <!-- News Feed -->
+        <div id="newsFeed" class="space-y-4 hidden">
+            <!-- News cards will be inserted here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-20 hidden">
+            <div class="text-6xl mb-4">📰</div>
+            <p class="text-xl text-gray-600" id="emptyText">No news found</p>
+            <p class="text-sm text-gray-500 mt-2">Try changing filters or search terms</p>
+        </div>
+
+        <!-- About Section -->
+        <div class="card p-6 mt-8">
+            <h3 class="text-xl font-bold mb-3" id="aboutTitle">About Nirvana Read</h3>
+            <p class="text-gray-700 leading-relaxed" id="aboutText">
+                Nirvana Read curates news that matters to you as an Indian citizen. 
+                We focus on stories that impact your rights, health, social life, and economic wellbeing. 
+                Powered by AI and collective intelligence, we filter noise and bring you what truly matters.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+                <span class="badge bg-purple-100 text-purple-700">Rights & Laws</span>
+                <span class="badge bg-green-100 text-green-700">Health & Safety</span>
+                <span class="badge bg-blue-100 text-blue-700">Social Issues</span>
+                <span class="badge bg-yellow-100 text-yellow-700">Economic Impact</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============== STATE ==============
+        let allNews = [];
+        let currentLang = 'en';
+        let userId = localStorage.getItem('userId') || generateUserId();
+        let userInteractions = JSON.parse(localStorage.getItem('userInteractions') || '{}');
+
+        // Translations
+        const translations = {
+            en: {
+                mainTitle: 'Nirvana Read',
+                subtitle: 'News curated for you',
+                searchPlaceholder: 'Search news...',
+                allCategories: 'All Categories',
+                allLanguages: 'All Languages',
+                refreshBtn: 'Refresh',
+                loadingText: 'Loading curated news...',
+                emptyText: 'No news found',
+                aboutTitle: 'About Nirvana Read',
+                aboutText: 'Nirvana Read curates news that matters to you as an Indian citizen. We focus on stories that impact your rights, health, social life, and economic wellbeing. Powered by AI and collective intelligence, we filter noise and bring you what truly matters.',
+                readMore: 'Read Full Article',
+                markReviewed: 'Mark as Read'
+            },
+            hi: {
+                mainTitle: 'निर्वाण रीड',
+                subtitle: 'आपके लिए चयनित समाचार',
+                searchPlaceholder: 'समाचार खोजें...',
+                allCategories: 'सभी श्रेणियां',
+                allLanguages: 'सभी भाषाएं',
+                refreshBtn: 'नया करें',
+                loadingText: 'समाचार लोड हो रहे हैं...',
+                emptyText: 'कोई समाचार नहीं मिला',
+                aboutTitle: 'निर्वाण रीड के बारे में',
+                aboutText: 'निर्वाण रीड उन समाचारों को चुनता है जो आपके लिए महत्वपूर्ण हैं। हम आपके अधिकार, स्वास्थ्य, सामाजिक जीवन और आर्थिक कल्याण को प्रभावित करने वाली खबरों पर ध्यान केंद्रित करते हैं।',
+                readMore: 'पूरा लेख पढ़ें',
+                markReviewed: 'पढ़ा गया'
+            }
+        };
+
+        // ============== INITIALIZATION ==============
+        
+        function generateUserId() {
+            const id = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('userId', id);
+            return id;
+        }
+
+        window.onload = () => {
+            loadNews();
+            setupEventListeners();
+        };
+
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', filterNews);
+            document.getElementById('categoryFilter').addEventListener('change', filterNews);
+            document.getElementById('languageFilter').addEventListener('change', filterNews);
+        }
+
+        // ============== LANGUAGE TOGGLE ==============
+        
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'hi' : 'en';
+            updateUILanguage();
+        }
+
+        function updateUILanguage() {
+            const t = translations[currentLang];
+            
+            document.getElementById('mainTitle').textContent = t.mainTitle;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+            document.getElementById('refreshBtn').textContent = t.refreshBtn;
+            document.getElementById('loadingText').textContent = t.loadingText;
+            document.getElementById('emptyText').textContent = t.emptyText;
+            document.getElementById('aboutTitle').textContent = t.aboutTitle;
+            document.getElementById('aboutText').textContent = t.aboutText;
+            document.getElementById('langToggle').textContent = currentLang === 'en' ? 'हिंदी' : 'English';
+            
+            // Update category filter
+            const catFilter = document.getElementById('categoryFilter');
+            if (catFilter.options[0]) {
+                catFilter.options[0].text = t.allCategories;
+            }
+            
+            const langFilter = document.getElementById('languageFilter');
+            if (langFilter.options[0]) {
+                langFilter.options[0].text = t.allLanguages;
+            }
+            
+            // Re-render news cards with new language
+            filterNews();
+        }
+
+        // ============== NEWS LOADING ==============
+        
+        async function loadNews() {
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/api/news');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allNews = data.news;
+                    updateCategoryFilter();
+                    filterNews();
+                    updateLastUpdateTime(data.cached_at);
+                    showLoading(false);
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                console.error('Error loading news:', error);
+                alert('Failed to load news. Please try again.');
+                showLoading(false);
+            }
+        }
+
+        async function refreshNews() {
+            const btn = document.getElementById('refreshBtn');
+            const originalText = btn.textContent;
+            btn.textContent = '⏳';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/refresh', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    await loadNews();
+                    alert(`✅ Refreshed! ${data.total} news loaded.`);
+                }
+            } catch (error) {
+                alert('Refresh failed. Please try again.');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // ============== FILTERING ==============
+        
+        function updateCategoryFilter() {
+            const categories = [...new Set(allNews.map(n => ({ key: n.categoryKey, name: n.category })))];
+            const select = document.getElementById('categoryFilter');
+            
+            const currentValue = select.value;
+            select.innerHTML = `<option value="all">${translations[currentLang].allCategories}</option>`;
+            
+            categories.forEach(cat => {
+                select.innerHTML += `<option value="${cat.key}">${cat.name}</option>`;
+            });
+            
+            select.value = currentValue;
+        }
+
+        function filterNews() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const language = document.getElementById('languageFilter').value;
+            
+            let filtered = allNews.filter(n => {
+                const matchSearch = !search || 
+                    n.title.toLowerCase().includes(search) || 
+                    n.description.toLowerCase().includes(search);
+                const matchCategory = category === 'all' || n.categoryKey === category;
+                const matchLanguage = language === 'all' || n.language === language;
+                
+                return matchSearch && matchCategory && matchLanguage;
+            });
+            
+            displayNews(filtered);
+        }
+
+        // ============== DISPLAY ==============
+        
+        function displayNews(newsArray) {
+            const feed = document.getElementById('newsFeed');
+            const empty = document.getElementById('emptyState');
+            
+            document.getElementById('newsCount').textContent = newsArray.length;
+            
+            if (newsArray.length === 0) {
+                feed.classList.add('hidden');
+                empty.classList.remove('hidden');
+                return;
+            }
+            
+            feed.classList.remove('hidden');
+            empty.classList.add('hidden');
+            
+            feed.innerHTML = newsArray.map(news => createNewsCard(news)).join('');
+        }
+
+        function createNewsCard(news) {
+            const t = translations[currentLang];
+            const isReviewed = userInteractions[news.id]?.reviewed;
+            const categoryName = currentLang === 'hi' ? news.category_hi : news.category;
+            
+            return `
+                <div class="card p-6 ${isReviewed ? 'opacity-60' : ''}" id="news-${news.id}">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <!-- Header -->
+                            <div class="flex items-center gap-2 mb-3 flex-wrap">
+                                <span class="badge bg-purple-100 text-purple-700">${categoryName}</span>
+                                <span class="badge bg-gray-100 text-gray-700">${news.language === 'hindi' ? 'हिंदी' : 'English'}</span>
+                                <span class="text-xs text-gray-500">• ${news.source}</span>
+                                <span class="text-xs text-gray-500">• ${news.timeAgo}</span>
+                            </div>
+                            
+                            <!-- Title -->
+                            <h2 class="text-xl font-bold text-gray-900 mb-2 leading-tight hover:text-purple-700 cursor-pointer" 
+                                onclick="openNews('${news.url}', '${news.id}', '${news.categoryKey}')">
+                                ${news.title}
+                            </h2>
+                            
+                            <!-- Description -->
+                            <p class="text-gray-700 mb-4 leading-relaxed">${news.description}</p>
+                            
+                            <!-- AI Reasoning -->
+                            ${news.reasoning && news.reasoning !== 'AI analysis unavailable' ? `
+                                <div class="bg-purple-50 border-l-4 border-purple-400 p-3 mb-4 rounded">
+                                    <p class="text-xs font-semibold text-purple-900 mb-1">🤖 AI Analysis:</p>
+                                    <p class="text-sm text-purple-800">${news.reasoning}</p>
+                                </div>
+                            ` : ''}
+                            
+                            <!-- Actions -->
+                            <div class="flex items-center gap-3 mt-4">
+                                <a href="${news.url}" target="_blank" 
+                                   onclick="trackView('${news.id}', '${news.url}', '${news.categoryKey}')"
+                                   class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-semibold">
+                                    ${t.readMore} →
+                                </a>
+                                
+                                <button onclick="markReviewed('${news.id}', '${news.url}', '${news.categoryKey}')"
+                                        class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                                            isReviewed 
+                                                ? 'bg-gray-200 text-gray-700' 
+                                                : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                        }">
+                                    ${isReviewed ? '✓ Read' : t.markReviewed}
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Score Badge -->
+                        <div class="flex-shrink-0">
+                            <div class="score-badge">${news.score}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============== USER TRACKING ==============
+        
+        function trackView(newsId, newsUrl, category) {
+            // Track in localStorage
+            if (!userInteractions[newsId]) {
+                userInteractions[newsId] = { viewed: Date.now() };
+                localStorage.setItem('userInteractions', JSON.stringify(userInteractions));
+            }
+            
+            // Track in backend (async)
+            fetch('/api/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: userId,
+                    news_url: newsUrl,
+                    action: 'view',
+                    category: category
+                })
+            }).catch(e => console.error('Tracking error:', e));
+        }
+
+        function openNews(url, newsId, category) {
+            trackView(newsId, url, category);
+            window.open(url, '_blank');
+        }
+
+        function markReviewed(newsId, newsUrl, category) {
+            // Update localStorage
+            if (!userInteractions[newsId]) {
+                userInteractions[newsId] = {};
+            }
+            userInteractions[newsId].reviewed = !userInteractions[newsId].reviewed;
+            localStorage.setItem('userInteractions', JSON.stringify(userInteractions));
+            
+            // Track in backend
+            if (userInteractions[newsId].reviewed) {
+                fetch('/api/track', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        news_url: newsUrl,
+                        action: 'mark_reviewed',
+                        category: category,
+                        reading_time: 60
+                    })
+                }).catch(e => console.error('Tracking error:', e));
+            }
+            
+            // Re-render
+            filterNews();
+        }
+
+        // ============== UI HELPERS ==============
+        
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('hidden', !show);
+            document.getElementById('newsFeed').classList.toggle('hidden', show);
+        }
+
+        function updateLastUpdateTime(timestamp) {
+            if (!timestamp) return;
+            
+            const date = new Date(timestamp);
+            document.getElementById('lastUpdate').textContent = date.toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // ============== OFFLINE SUPPORT ==============
+        
+        // Cache news in localStorage for offline reading
+        window.addEventListener('load', () => {
+            if ('serviceWorker' in navigator) {
+                // Optional: Register service worker for offline support
+                // navigator.serviceWorker.register('/sw.js');
+            }
+        });
+    </script>
+</body>
+</html>
