@@ -1,31 +1,23 @@
 """
 =============================================================================
-NIRVANA READ - Top 20 Curated Indian News Sources
-Focus: Rights, Health, Social Issues, Economic Impact on Citizens
+NIRVANA READ - Enhanced Categories & Keywords
+9 categories for comprehensive citizen news coverage
 =============================================================================
 """
 
 # ============== TOP 20 CURATED SOURCES ==============
-
-# Focus Categories:
-# B: Rights & Laws
-# C: Health & Safety
-# D: Social Issues
-# E: Economic (citizen impact)
-
 CURATED_SOURCES = {
     # ============== ENGLISH SOURCES (12) ==============
     'the_hindu': {
         'name': 'The Hindu',
         'language': 'english',
-        'reliability': 10,  # 1-10 scale
+        'reliability': 10,
         'feeds': {
             'national': 'https://www.thehindu.com/news/national/feeder/default.rss',
             'cities': 'https://www.thehindu.com/news/cities/feeder/default.rss'
         },
-        'focus': ['rights', 'social', 'health', 'economic']
+        'focus': ['rights', 'social', 'health', 'economic', 'crime']
     },
-    
     'indian_express': {
         'name': 'Indian Express',
         'language': 'english',
@@ -34,9 +26,8 @@ CURATED_SOURCES = {
             'india': 'https://indianexpress.com/section/india/feed/',
             'cities': 'https://indianexpress.com/section/cities/feed/'
         },
-        'focus': ['rights', 'social', 'economic']
+        'focus': ['rights', 'social', 'economic', 'crime']
     },
-    
     'the_wire': {
         'name': 'The Wire',
         'language': 'english',
@@ -46,9 +37,8 @@ CURATED_SOURCES = {
             'politics': 'https://thewire.in/politics/feed',
             'health': 'https://thewire.in/health/feed'
         },
-        'focus': ['rights', 'social', 'health']
+        'focus': ['rights', 'social', 'health', 'religion']
     },
-    
     'scroll': {
         'name': 'Scroll.in',
         'language': 'english',
@@ -56,9 +46,8 @@ CURATED_SOURCES = {
         'feeds': {
             'india': 'https://scroll.in/feeds/india.rss'
         },
-        'focus': ['rights', 'social', 'economic']
+        'focus': ['rights', 'social', 'economic', 'religion']
     },
-    
     'ndtv': {
         'name': 'NDTV',
         'language': 'english',
@@ -66,9 +55,8 @@ CURATED_SOURCES = {
         'feeds': {
             'india': 'https://feeds.feedburner.com/ndtv/India'
         },
-        'focus': ['social', 'health', 'economic']
+        'focus': ['social', 'health', 'economic', 'crime']
     },
-    
     'hindustan_times': {
         'name': 'Hindustan Times',
         'language': 'english',
@@ -77,9 +65,8 @@ CURATED_SOURCES = {
             'india': 'https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml',
             'cities': 'https://www.hindustantimes.com/feeds/rss/cities/rssfeed.xml'
         },
-        'focus': ['social', 'health', 'economic']
+        'focus': ['social', 'health', 'economic', 'crime']
     },
-    
     'the_print': {
         'name': 'The Print',
         'language': 'english',
@@ -89,7 +76,6 @@ CURATED_SOURCES = {
         },
         'focus': ['rights', 'economic', 'social']
     },
-    
     'livemint': {
         'name': 'Livemint',
         'language': 'english',
@@ -98,9 +84,8 @@ CURATED_SOURCES = {
             'politics': 'https://www.livemint.com/rss/politics',
             'news': 'https://www.livemint.com/rss/news'
         },
-        'focus': ['economic', 'rights']
+        'focus': ['economic', 'rights', 'science']
     },
-    
     'down_to_earth': {
         'name': 'Down To Earth',
         'language': 'english',
@@ -109,9 +94,8 @@ CURATED_SOURCES = {
             'health': 'https://www.downtoearth.org.in/rss/health',
             'pollution': 'https://www.downtoearth.org.in/rss/air'
         },
-        'focus': ['health', 'social']
+        'focus': ['health', 'environment']
     },
-    
     'the_quint': {
         'name': 'The Quint',
         'language': 'english',
@@ -119,9 +103,8 @@ CURATED_SOURCES = {
         'feeds': {
             'news': 'https://www.thequint.com/api/v1/feed'
         },
-        'focus': ['rights', 'social', 'health']
+        'focus': ['rights', 'social', 'health', 'crime']
     },
-    
     'news18': {
         'name': 'News18',
         'language': 'english',
@@ -129,9 +112,8 @@ CURATED_SOURCES = {
         'feeds': {
             'india': 'https://www.news18.com/rss/india.xml'
         },
-        'focus': ['social', 'economic']
+        'focus': ['social', 'economic', 'crime']
     },
-    
     'firstpost': {
         'name': 'Firstpost',
         'language': 'english',
@@ -150,9 +132,8 @@ CURATED_SOURCES = {
         'feeds': {
             'india': 'https://feeds.bbci.co.uk/hindi/india/rss.xml'
         },
-        'focus': ['social', 'health', 'economic', 'rights']
+        'focus': ['social', 'health', 'economic', 'rights', 'crime']
     },
-    
     'navbharat_times': {
         'name': 'नवभारत टाइम्स',
         'language': 'hindi',
@@ -160,9 +141,8 @@ CURATED_SOURCES = {
         'feeds': {
             'news': 'https://navbharattimes.indiatimes.com/rssfeedstopstories.cms'
         },
-        'focus': ['social', 'economic']
+        'focus': ['social', 'economic', 'crime']
     },
-    
     'dainik_jagran': {
         'name': 'दैनिक जागरण',
         'language': 'hindi',
@@ -170,9 +150,8 @@ CURATED_SOURCES = {
         'feeds': {
             'national': 'https://www.jagran.com/rss/news-national-hindi.xml'
         },
-        'focus': ['social', 'economic', 'rights']
+        'focus': ['social', 'economic', 'rights', 'crime']
     },
-    
     'amar_ujala': {
         'name': 'अमर उजाला',
         'language': 'hindi',
@@ -180,9 +159,8 @@ CURATED_SOURCES = {
         'feeds': {
             'india': 'https://www.amarujala.com/rss/india-news.xml'
         },
-        'focus': ['social', 'economic']
+        'focus': ['social', 'economic', 'crime']
     },
-    
     'ndtv_hindi': {
         'name': 'NDTV Hindi',
         'language': 'hindi',
@@ -190,9 +168,8 @@ CURATED_SOURCES = {
         'feeds': {
             'news': 'https://khabar.ndtv.com/rss/india'
         },
-        'focus': ['social', 'health', 'economic']
+        'focus': ['social', 'health', 'economic', 'crime']
     },
-    
     'patrika': {
         'name': 'पत्रिका',
         'language': 'hindi',
@@ -200,9 +177,8 @@ CURATED_SOURCES = {
         'feeds': {
             'india': 'https://www.patrika.com/rss/india-news.xml'
         },
-        'focus': ['social', 'economic']
+        'focus': ['social', 'economic', 'religion']
     },
-    
     'jagran_josh': {
         'name': 'Jagran Josh',
         'language': 'hindi',
@@ -210,9 +186,8 @@ CURATED_SOURCES = {
         'feeds': {
             'current_affairs': 'https://www.jagranjosh.com/rss/current-affairs.xml'
         },
-        'focus': ['rights', 'social', 'economic']
+        'focus': ['rights', 'social', 'economic', 'education']
     },
-    
     'nai_dunia': {
         'name': 'नई दुनिया',
         'language': 'hindi',
@@ -220,122 +195,193 @@ CURATED_SOURCES = {
         'feeds': {
             'national': 'https://www.naidunia.com/rss/national-news'
         },
-        'focus': ['social', 'economic']
+        'focus': ['social', 'economic', 'religion']
     }
 }
 
-# ============== CATEGORY DEFINITIONS ==============
-
+# ============== 9 ENHANCED CATEGORIES ==============
 FOCUS_CATEGORIES = {
     'rights': {
         'name_en': 'Rights & Laws',
         'name_hi': 'अधिकार व कानून',
         'keywords': [
-            # Rights
             'rights', 'law', 'court', 'judgment', 'verdict', 'supreme court',
             'high court', 'legal', 'justice', 'constitution', 'freedom',
             'civil rights', 'human rights', 'arrest', 'bail', 'custody',
-            # Hindi
+            'petition', 'ruling', 'advocate', 'lawyer', 'PIL',
             'अधिकार', 'कानून', 'न्यायालय', 'फैसला', 'सुप्रीम कोर्ट',
-            'कोर्ट', 'न्याय', 'संविधान', 'स्वतंत्रता', 'गिरफ्तारी'
+            'न्याय', 'संविधान', 'गिरफ्तारी', 'जमानत', 'याचिका'
         ],
-        'exclude': ['cricket', 'football', 'entertainment', 'celebrity']
+        'context_words': ['verdict', 'ruling', 'legal', 'constitutional'],
+        'india_keywords': ['supreme court india', 'high court', 'cji', 'पीआईएल'],
+        'color': 'purple',
+        'weight': 1.0
     },
     
     'health': {
         'name_en': 'Health & Safety',
         'name_hi': 'स्वास्थ्य व सुरक्षा',
         'keywords': [
-            # Health
             'health', 'hospital', 'doctor', 'medicine', 'disease', 'outbreak',
             'vaccine', 'treatment', 'medical', 'patient', 'covid', 'flu',
             'dengue', 'malaria', 'tuberculosis', 'diabetes', 'cancer',
             'food safety', 'drug', 'healthcare', 'ambulance', 'emergency',
-            # Air quality & pollution (citizen safety)
             'air quality', 'pollution', 'aqi', 'smog', 'breathing',
-            # Hindi
-            'स्वास्थ्य', 'अस्पताल', 'डॉक्टर', 'दवा', 'बीमारी', 'टीका',
-            'इलाज', 'मरीज', 'प्रदूषण', 'वायु गुणवत्ता'
+            'स्वास्थ्य', 'अस्पताल', 'डॉक्टर', 'दवा', 'बीमारी',
+            'टीका', 'इलाज', 'मरीज', 'प्रदूषण', 'वायु'
         ],
-        'exclude': ['fitness app', 'beauty', 'cosmetic', 'gym']
+        'context_words': ['epidemic', 'pandemic', 'contamination', 'safety alert'],
+        'india_keywords': ['aiims', 'icmr', 'ayush', 'delhi pollution'],
+        'color': 'green',
+        'weight': 1.2
     },
     
     'social': {
         'name_en': 'Social Issues',
         'name_hi': 'सामाजिक मुद्दे',
         'keywords': [
-            # Women & children
             'women', 'rape', 'harassment', 'violence', 'women safety',
             'child abuse', 'domestic violence', 'dowry', 'trafficking',
-            # Caste & discrimination
             'caste', 'dalit', 'discrimination', 'atrocity', 'lynching',
-            'mob violence', 'communal', 'riot', 'hate crime',
-            # Education & youth
-            'education', 'school', 'student', 'exam', 'suicide',
-            'mental health', 'depression', 'dropout', 'scholarship',
-            # Labor & workers
-            'worker', 'labor', 'wage', 'minimum wage', 'strike',
-            'unemployment', 'job loss', 'layoff',
-            # Hindi
-            'महिला', 'बलात्कार', 'हिंसा', 'सुरक्षा', 'जाति', 'दलित',
-            'भेदभाव', 'शिक्षा', 'छात्र', 'आत्महत्या', 'मजदूर', 'बेरोजगारी'
+            'mob violence', 'protest', 'demonstration', 'strike',
+            'unemployment', 'job loss', 'layoff', 'worker', 'labor',
+            'महिला', 'बलात्कार', 'हिंसा', 'जाति', 'दलित',
+            'भेदभाव', 'विरोध', 'प्रदर्शन', 'बेरोजगारी', 'मजदूर'
         ],
-        'exclude': ['celebrity', 'film', 'entertainment', 'sports']
+        'context_words': ['activism', 'movement', 'solidarity', 'marginalized'],
+        'india_keywords': ['reservation', 'sc st', 'obc', 'आरक्षण'],
+        'color': 'blue',
+        'weight': 1.1
     },
     
     'economic': {
         'name_en': 'Economic Impact',
         'name_hi': 'आर्थिक प्रभाव',
         'keywords': [
-            # Prices & cost of living
             'price', 'inflation', 'petrol', 'diesel', 'lpg', 'gas cylinder',
             'food price', 'onion', 'tomato', 'wheat', 'rice', 'dal',
             'ration', 'subsidy', 'pds', 'ration card',
-            # Banking & money
             'bank', 'atm', 'loan', 'interest rate', 'emi', 'credit',
-            'debit card', 'upi', 'digital payment', 'cash',
-            # Employment & income
-            'salary', 'pension', 'income', 'tax', 'tds', 'itr',
-            'gst', 'income tax', 'refund',
-            # Government schemes
-            'scheme', 'yojana', 'benefit', 'welfare', 'subsidy',
-            'aadhaar', 'pan card', 'direct benefit transfer', 'dbt',
-            # Transport & infrastructure
-            'train', 'railway', 'bus', 'metro', 'toll', 'highway',
-            'road', 'bridge', 'water supply', 'electricity', 'power cut',
-            # Hindi
-            'कीमत', 'महंगाई', 'पेट्रोल', 'डीजल', 'गैस', 'राशन',
-            'सब्सिडी', 'बैंक', 'लोन', 'वेतन', 'पेंशन', 'कर',
-            'योजना', 'आधार', 'रेलवे', 'बिजली', 'पानी'
+            'salary', 'pension', 'income', 'tax', 'gst', 'income tax',
+            'scheme', 'yojana', 'benefit', 'welfare', 'dbt',
+            'train', 'railway', 'bus', 'metro', 'toll', 'fare',
+            'electricity', 'power cut', 'water supply', 'bill',
+            'budget', 'economy', 'fiscal', 'gdp', 'growth',
+            'rupee', 'dollar', 'currency', 'rbi', 'reserve bank',
+            'कीमत', 'महंगाई', 'पेट्रोल', 'गैस', 'राशन',
+            'बैंक', 'लोन', 'पेंशन', 'कर', 'योजना',
+            'रेलवे', 'बिजली', 'पानी', 'बजट', 'रुपया'
         ],
-        'exclude': ['stock market', 'sensex', 'nifty', 'shares', 'ipo',
-                   'mutual fund', 'investment tips', 'startup funding']
+        'context_words': ['hike', 'reduction', 'announcement', 'relief'],
+        'india_keywords': ['union budget', 'finance minister', 'rbi governor'],
+        'color': 'yellow',
+        'weight': 1.3
+    },
+    
+    'religion': {
+        'name_en': 'Religion & Superstition',
+        'name_hi': 'धर्म व अंधविश्वास',
+        'keywords': [
+            'religious', 'communal', 'intolerance', 'fundamentalism',
+            'extremism', 'sectarian', 'superstition', 'orthodox',
+            'riot', 'violence', 'hate crime', 'mob lynching',
+            'temple', 'mosque', 'church', 'worship', 'ritual',
+            'godman', 'baba', 'fake baba', 'miracle', 'faith healer',
+            'black magic', 'witchcraft', 'occult', 'astrology scam',
+            'सांप्रदायिक', 'धार्मिक', 'अंधविश्वास', 'कट्टरपंथ',
+            'दंगा', 'मॉब लिंचिंग', 'मंदिर', 'मस्जिद', 'गिरजाघर',
+            'बाबा', 'चमत्कार', 'टोना', 'काला जादू', 'ज्योतिष'
+        ],
+        'context_words': ['radical', 'fanatic', 'belief', 'conversion'],
+        'india_keywords': ['hindu muslim', 'mandir masjid', 'धार्मिक तनाव'],
+        'color': 'red',
+        'weight': 1.0
+    },
+    
+    'science': {
+        'name_en': 'Science & Innovation',
+        'name_hi': 'विज्ञान व तकनीक',
+        'keywords': [
+            'science', 'research', 'innovation', 'technology',
+            'discovery', 'invention', 'scientist', 'laboratory',
+            'isro', 'space', 'satellite', 'mission', 'rocket',
+            'ai', 'artificial intelligence', 'machine learning',
+            'digital', 'internet', 'cyber', 'data',
+            'vaccine', 'cure', 'treatment', 'medical breakthrough',
+            'energy', 'solar', 'renewable', 'green tech',
+            'विज्ञान', 'अनुसंधान', 'तकनीक', 'खोज',
+            'इसरो', 'अंतरिक्ष', 'उपग्रह', 'डिजिटल'
+        ],
+        'context_words': ['breakthrough', 'innovation', 'advancement', 'development'],
+        'india_keywords': ['isro', 'drdo', 'csir', 'iit', 'chandrayaan'],
+        'color': 'indigo',
+        'weight': 0.9
+    },
+    
+    'environment': {
+        'name_en': 'Environment & Climate',
+        'name_hi': 'पर्यावरण व जलवायु',
+        'keywords': [
+            'climate change', 'global warming', 'greenhouse', 'emissions',
+            'deforestation', 'forest', 'trees', 'wildlife',
+            'pollution', 'air quality', 'water pollution', 'river',
+            'flood', 'drought', 'cyclone', 'earthquake', 'disaster',
+            'monsoon', 'rainfall', 'weather', 'heatwave', 'cold wave',
+            'renewable', 'solar', 'wind', 'hydro', 'clean energy',
+            'plastic', 'waste', 'garbage', 'sanitation', 'cleanliness',
+            'जलवायु', 'पर्यावरण', 'प्रदूषण', 'वन', 'वन्यजीव',
+            'बाढ़', 'सूखा', 'चक्रवात', 'भूकंप', 'आपदा',
+            'मानसून', 'बारिश', 'गर्मी', 'प्लास्टिक', 'कचरा'
+        ],
+        'context_words': ['conservation', 'protection', 'sustainability', 'eco-friendly'],
+        'india_keywords': ['ganga', 'yamuna', 'himalaya', 'sundarbans', 'delhi pollution'],
+        'color': 'teal',
+        'weight': 1.1
+    },
+    
+    'crime': {
+        'name_en': 'Crime & Justice',
+        'name_hi': 'अपराध व न्याय',
+        'keywords': [
+            'crime', 'murder', 'theft', 'robbery', 'kidnapping',
+            'fraud', 'scam', 'corruption', 'bribery', 'embezzlement',
+            'police', 'arrest', 'investigation', 'cbi', 'ed',
+            'accused', 'suspect', 'criminal', 'convict', 'prisoner',
+            'rape', 'assault', 'attack', 'violence', 'shooting',
+            'drug', 'narcotic', 'smuggling', 'trafficking',
+            'cybercrime', 'hacking', 'online fraud', 'phishing',
+            'अपराध', 'हत्या', 'चोरी', 'डकैती', 'अपहरण',
+            'घोटाला', 'भ्रष्टाचार', 'पुलिस', 'गिरफ्तारी',
+            'बलात्कार', 'हमला', 'साइबर अपराध', 'धोखाधड़ी'
+        ],
+        'context_words': ['charged', 'booked', 'fir', 'case registered'],
+        'india_keywords': ['cbi', 'ed', 'ncb', 'सीबीआई', 'एनसीबी'],
+        'color': 'rose',
+        'weight': 1.0
+    },
+    
+    'education': {
+        'name_en': 'Education & Youth',
+        'name_hi': 'शिक्षा व युवा',
+        'keywords': [
+            'education', 'school', 'college', 'university', 'student',
+            'exam', 'board', 'cbse', 'icse', 'neet', 'jee', 'iit',
+            'admission', 'fee', 'scholarship', 'hostel',
+            'teacher', 'professor', 'principal', 'vice chancellor',
+            'syllabus', 'curriculum', 'degree', 'certificate',
+            'coaching', 'tuition', 'private tuition',
+            'youth', 'teenager', 'young', 'campus',
+            'suicide', 'depression', 'stress', 'pressure',
+            'dropout', 'attendance', 'marks', 'result',
+            'शिक्षा', 'स्कूल', 'कॉलेज', 'छात्र', 'परीक्षा',
+            'बोर्ड', 'नीट', 'जेईई', 'शुल्क', 'छात्रवृत्ति',
+            'शिक्षक', 'पाठ्यक्रम', 'कोचिंग', 'युवा', 'आत्महत्या'
+        ],
+        'context_words': ['academic', 'learning', 'examination', 'admission'],
+        'india_keywords': ['cbse', 'neet', 'jee', 'ugc', 'ncert'],
+        'color': 'cyan',
+        'weight': 1.0
     }
-}
-
-# ============== EXCLUSION PATTERNS ==============
-
-EXCLUSIONS = {
-    'entertainment': [
-        'bollywood', 'hollywood', 'film', 'movie', 'actor', 'actress',
-        'celebrity', 'star', 'entertainment', 'box office', 'trailer',
-        'bigg boss', 'reality show', 'tv show', 'web series', 'ott'
-    ],
-    'sports': [
-        'cricket', 'ipl', 'football', 'hockey', 'kabaddi', 'sports',
-        'match', 'tournament', 'player', 'team', 'score', 'wicket',
-        'goal', 'champion', 'league'
-        # Exception: Olympics, World Cup finals allowed (handled in code)
-    ],
-    'tech_gadgets': [
-        'smartphone', 'iphone', 'android', 'laptop', 'tablet',
-        'gadget', 'launch event', 'product launch', 'specs',
-        'review', 'unboxing', 'gaming'
-    ],
-    'business': [
-        'quarterly results', 'earnings', 'profit', 'revenue',
-        'stock price', 'market cap', 'ipo', 'fy quarter'
-    ]
 }
 
 # ============== HELPER FUNCTIONS ==============
@@ -360,37 +406,30 @@ def get_category_keywords(category_key):
     """Get keywords for a specific category"""
     return FOCUS_CATEGORIES.get(category_key, {}).get('keywords', [])
 
-def get_exclusion_keywords():
-    """Get all exclusion keywords"""
-    all_exclusions = []
-    for category, keywords in EXCLUSIONS.items():
-        all_exclusions.extend(keywords)
-    return all_exclusions
-
 def is_relevant_to_citizen(title, description):
     """
     Quick check: Is this news relevant to an average Indian citizen?
-    Returns: (is_relevant, matched_category)
+    Returns: (is_relevant, matched_category, confidence)
     """
     text = f"{title} {description}".lower()
     
-    # Check exclusions first (faster rejection)
-    exclusion_keywords = get_exclusion_keywords()
-    for keyword in exclusion_keywords:
-        if keyword in text:
-            # Exception for major events
-            major_event_indicators = ['world cup final', 'olympics gold', 
-                                     'national emergency', 'breaking']
-            if not any(indicator in text for indicator in major_event_indicators):
-                return False, None
+    best_match = None
+    best_score = 0
     
-    # Check category relevance
+    # Check each category
     for category_key, category_data in FOCUS_CATEGORIES.items():
         keywords = category_data['keywords']
         matches = sum(1 for kw in keywords if kw in text)
         
-        # If 2+ keywords match, consider relevant
-        if matches >= 2:
-            return True, category_key
+        # Weight by category importance
+        weighted_score = matches * category_data.get('weight', 1.0)
+        
+        # If 1+ keywords match, consider relevant
+        if weighted_score > best_score:
+            best_score = weighted_score
+            best_match = category_key
     
-    return False, None
+    if best_match and best_score >= 1:
+        return True, best_match, best_score
+    
+    return False, None, 0
