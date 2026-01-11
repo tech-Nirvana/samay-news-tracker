@@ -6,35 +6,28 @@
     <title>Nirvana Read - News Curated for You</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Nirvana Read Custom Theme */
         :root {
             --primary: #7c3aed;
             --secondary: #fbbf24;
             --accent: #ff9933;
-            --bg: #f9fafb;
-            --card: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f9fafb;
         }
         
         .gradient-text {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
         
         .card {
-            background: var(--card);
+            background: white;
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
         
         .card:hover {
@@ -71,21 +64,13 @@
             font-weight: 700;
             padding: 8px 16px;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(124,58,237,0.3);
-        }
-        
-        /* Mobile optimizations */
-        @media (max-width: 640px) {
-            .mobile-hide { display: none; }
         }
     </style>
 </head>
-<body class="min-h-screen">
-    <!-- Header -->
+<body>
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
-                <!-- Logo -->
                 <div>
                     <h1 class="text-3xl font-bold gradient-text flex items-center gap-2">
                         <span class="text-4xl">🕉️</span>
@@ -93,110 +78,91 @@
                     </h1>
                     <p class="text-sm text-gray-600 mt-1" id="subtitle">News curated for you</p>
                 </div>
-                
-                <!-- Language Toggle -->
-                <button onclick="toggleLanguage()" class="px-4 py-2 rounded-lg border-2 border-purple-200 hover:bg-purple-50 transition-colors">
+                <button onclick="toggleLanguage()" class="px-4 py-2 rounded-lg border-2 border-purple-200 hover:bg-purple-50">
                     <span id="langToggle">हिंदी</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Container -->
     <div class="max-w-6xl mx-auto px-4 py-6">
-        
-        <!-- Filters & Search -->
         <div class="card p-4 mb-6">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <!-- Search -->
                 <input 
                     type="text" 
                     id="searchInput"
                     placeholder="Search news..."
-                    class="col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    class="col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                 />
                 
-                <!-- Category Filter -->
-                <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-lg">
                     <option value="all">All Categories</option>
                 </select>
                 
-                <!-- Language Filter -->
-                <select id="languageFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                <select id="languageFilter" class="px-4 py-2 border border-gray-300 rounded-lg">
                     <option value="all">All Languages</option>
                     <option value="english">English</option>
                     <option value="hindi">Hindi</option>
                 </select>
             </div>
             
-            <!-- Info Bar -->
-            <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+            <div class="flex items-center justify-between mt-4 pt-4 border-t">
                 <div class="flex items-center gap-4 text-sm text-gray-600">
                     <span>📰 <strong id="newsCount">0</strong> news</span>
-                    <span class="mobile-hide">⏰ Updated: <strong id="lastUpdate">--:--</strong></span>
+                    <span>⏰ Updated: <strong id="lastUpdate">--:--</strong></span>
                 </div>
-                
-                <button onclick="refreshNews()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-semibold">
+                <button onclick="refreshNews()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-semibold">
                     🔄 <span id="refreshBtn">Refresh</span>
                 </button>
             </div>
         </div>
 
-        <!-- Loading State -->
         <div id="loading" class="text-center py-20">
             <div class="loading-spinner mx-auto mb-4"></div>
             <p class="text-gray-600" id="loadingText">Loading curated news...</p>
         </div>
 
-        <!-- News Feed -->
-        <div id="newsFeed" class="space-y-4 hidden">
-            <!-- News cards will be inserted here -->
-        </div>
+        <div id="newsFeed" class="space-y-4 hidden"></div>
 
-        <!-- Empty State -->
         <div id="emptyState" class="text-center py-20 hidden">
             <div class="text-6xl mb-4">📰</div>
-            <p class="text-xl text-gray-600" id="emptyText">No news found</p>
-            <p class="text-sm text-gray-500 mt-2">Try changing filters or search terms</p>
+            <p class="text-xl text-gray-600">No news found</p>
         </div>
 
-        <!-- About Section -->
         <div class="card p-6 mt-8">
             <h3 class="text-xl font-bold mb-3" id="aboutTitle">About Nirvana Read</h3>
             <p class="text-gray-700 leading-relaxed" id="aboutText">
                 Nirvana Read curates news that matters to you as an Indian citizen. 
-                We focus on stories that impact your rights, health, social life, and economic wellbeing. 
-                Powered by AI and collective intelligence, we filter noise and bring you what truly matters.
+                We focus on stories that impact your rights, health, social life, and economic wellbeing.
             </p>
             <div class="mt-4 flex flex-wrap gap-2">
                 <span class="badge bg-purple-100 text-purple-700">Rights & Laws</span>
                 <span class="badge bg-green-100 text-green-700">Health & Safety</span>
                 <span class="badge bg-blue-100 text-blue-700">Social Issues</span>
                 <span class="badge bg-yellow-100 text-yellow-700">Economic Impact</span>
+                <span class="badge bg-red-100 text-red-700">Religion & Superstition</span>
+                <span class="badge bg-indigo-100 text-indigo-700">Science & Innovation</span>
+                <span class="badge bg-teal-100 text-teal-700">Environment & Climate</span>
+                <span class="badge bg-rose-100 text-rose-700">Crime & Justice</span>
+                <span class="badge bg-cyan-100 text-cyan-700">Education & Youth</span>
             </div>
         </div>
     </div>
 
     <script>
-        // ============== STATE ==============
         let allNews = [];
         let currentLang = 'en';
         let userId = localStorage.getItem('userId') || generateUserId();
         let userInteractions = JSON.parse(localStorage.getItem('userInteractions') || '{}');
 
-        // Translations
         const translations = {
             en: {
                 mainTitle: 'Nirvana Read',
                 subtitle: 'News curated for you',
                 searchPlaceholder: 'Search news...',
                 allCategories: 'All Categories',
-                allLanguages: 'All Languages',
                 refreshBtn: 'Refresh',
                 loadingText: 'Loading curated news...',
-                emptyText: 'No news found',
-                aboutTitle: 'About Nirvana Read',
-                aboutText: 'Nirvana Read curates news that matters to you as an Indian citizen. We focus on stories that impact your rights, health, social life, and economic wellbeing. Powered by AI and collective intelligence, we filter noise and bring you what truly matters.',
                 readMore: 'Read Full Article',
                 markReviewed: 'Mark as Read'
             },
@@ -205,19 +171,13 @@
                 subtitle: 'आपके लिए चयनित समाचार',
                 searchPlaceholder: 'समाचार खोजें...',
                 allCategories: 'सभी श्रेणियां',
-                allLanguages: 'सभी भाषाएं',
                 refreshBtn: 'नया करें',
                 loadingText: 'समाचार लोड हो रहे हैं...',
-                emptyText: 'कोई समाचार नहीं मिला',
-                aboutTitle: 'निर्वाण रीड के बारे में',
-                aboutText: 'निर्वाण रीड उन समाचारों को चुनता है जो आपके लिए महत्वपूर्ण हैं। हम आपके अधिकार, स्वास्थ्य, सामाजिक जीवन और आर्थिक कल्याण को प्रभावित करने वाली खबरों पर ध्यान केंद्रित करते हैं।',
                 readMore: 'पूरा लेख पढ़ें',
                 markReviewed: 'पढ़ा गया'
             }
         };
 
-        // ============== INITIALIZATION ==============
-        
         function generateUserId() {
             const id = 'user_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('userId', id);
@@ -235,8 +195,6 @@
             document.getElementById('languageFilter').addEventListener('change', filterNews);
         }
 
-        // ============== LANGUAGE TOGGLE ==============
-        
         function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'hi' : 'en';
             updateUILanguage();
@@ -244,34 +202,19 @@
 
         function updateUILanguage() {
             const t = translations[currentLang];
-            
             document.getElementById('mainTitle').textContent = t.mainTitle;
             document.getElementById('subtitle').textContent = t.subtitle;
             document.getElementById('searchInput').placeholder = t.searchPlaceholder;
             document.getElementById('refreshBtn').textContent = t.refreshBtn;
             document.getElementById('loadingText').textContent = t.loadingText;
-            document.getElementById('emptyText').textContent = t.emptyText;
-            document.getElementById('aboutTitle').textContent = t.aboutTitle;
-            document.getElementById('aboutText').textContent = t.aboutText;
             document.getElementById('langToggle').textContent = currentLang === 'en' ? 'हिंदी' : 'English';
             
-            // Update category filter
             const catFilter = document.getElementById('categoryFilter');
-            if (catFilter.options[0]) {
-                catFilter.options[0].text = t.allCategories;
-            }
+            if (catFilter.options[0]) catFilter.options[0].text = t.allCategories;
             
-            const langFilter = document.getElementById('languageFilter');
-            if (langFilter.options[0]) {
-                langFilter.options[0].text = t.allLanguages;
-            }
-            
-            // Re-render news cards with new language
             filterNews();
         }
 
-        // ============== NEWS LOADING ==============
-        
         async function loadNews() {
             showLoading(true);
             
@@ -285,19 +228,16 @@
                     filterNews();
                     updateLastUpdateTime(data.cached_at);
                     showLoading(false);
-                } else {
-                    throw new Error(data.error);
                 }
             } catch (error) {
-                console.error('Error loading news:', error);
-                alert('Failed to load news. Please try again.');
+                console.error('Error:', error);
+                alert('Failed to load news');
                 showLoading(false);
             }
         }
 
         async function refreshNews() {
             const btn = document.getElementById('refreshBtn');
-            const originalText = btn.textContent;
             btn.textContent = '⏳';
             btn.disabled = true;
             
@@ -307,18 +247,16 @@
                 
                 if (data.success) {
                     await loadNews();
-                    alert(`✅ Refreshed! ${data.total} news loaded.`);
+                    alert(`✅ ${data.total} news loaded!`);
                 }
             } catch (error) {
-                alert('Refresh failed. Please try again.');
+                alert('Refresh failed');
             } finally {
-                btn.textContent = originalText;
+                btn.textContent = translations[currentLang].refreshBtn;
                 btn.disabled = false;
             }
         }
 
-        // ============== FILTERING ==============
-        
         function updateCategoryFilter() {
             const categories = [...new Set(allNews.map(n => ({ key: n.categoryKey, name: n.category })))];
             const select = document.getElementById('categoryFilter');
@@ -351,8 +289,6 @@
             displayNews(filtered);
         }
 
-        // ============== DISPLAY ==============
-        
         function displayNews(newsArray) {
             const feed = document.getElementById('newsFeed');
             const empty = document.getElementById('emptyState');
@@ -380,7 +316,6 @@
                 <div class="card p-6 ${isReviewed ? 'opacity-60' : ''}" id="news-${news.id}">
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex-1">
-                            <!-- Header -->
                             <div class="flex items-center gap-2 mb-3 flex-wrap">
                                 <span class="badge bg-purple-100 text-purple-700">${categoryName}</span>
                                 <span class="badge bg-gray-100 text-gray-700">${news.language === 'hindi' ? 'हिंदी' : 'English'}</span>
@@ -388,43 +323,36 @@
                                 <span class="text-xs text-gray-500">• ${news.timeAgo}</span>
                             </div>
                             
-                            <!-- Title -->
                             <h2 class="text-xl font-bold text-gray-900 mb-2 leading-tight hover:text-purple-700 cursor-pointer" 
                                 onclick="openNews('${news.url}', '${news.id}', '${news.categoryKey}')">
                                 ${news.title}
                             </h2>
                             
-                            <!-- Description -->
-                            <p class="text-gray-700 mb-4 leading-relaxed">${news.description}</p>
+                            <p class="text-gray-700 mb-4">${news.description}</p>
                             
-                            <!-- AI Reasoning -->
-                            ${news.reasoning && news.reasoning !== 'AI analysis unavailable' ? `
+                            ${news.reasoning && news.reasoning !== 'AI analysis unavailable' && news.reasoning !== 'Rule-based scoring (AI unavailable)' ? `
                                 <div class="bg-purple-50 border-l-4 border-purple-400 p-3 mb-4 rounded">
-                                    <p class="text-xs font-semibold text-purple-900 mb-1">🤖 AI Analysis:</p>
+                                    <p class="text-xs font-semibold text-purple-900 mb-1">🤖 AI:</p>
                                     <p class="text-sm text-purple-800">${news.reasoning}</p>
                                 </div>
                             ` : ''}
                             
-                            <!-- Actions -->
                             <div class="flex items-center gap-3 mt-4">
                                 <a href="${news.url}" target="_blank" 
                                    onclick="trackView('${news.id}', '${news.url}', '${news.categoryKey}')"
-                                   class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-semibold">
+                                   class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-semibold">
                                     ${t.readMore} →
                                 </a>
                                 
                                 <button onclick="markReviewed('${news.id}', '${news.url}', '${news.categoryKey}')"
-                                        class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                                            isReviewed 
-                                                ? 'bg-gray-200 text-gray-700' 
-                                                : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                        class="px-4 py-2 rounded-lg text-sm font-semibold ${
+                                            isReviewed ? 'bg-gray-200 text-gray-700' : 'bg-green-100 text-green-700 hover:bg-green-200'
                                         }">
                                     ${isReviewed ? '✓ Read' : t.markReviewed}
                                 </button>
                             </div>
                         </div>
                         
-                        <!-- Score Badge -->
                         <div class="flex-shrink-0">
                             <div class="score-badge">${news.score}</div>
                         </div>
@@ -433,16 +361,12 @@
             `;
         }
 
-        // ============== USER TRACKING ==============
-        
         function trackView(newsId, newsUrl, category) {
-            // Track in localStorage
             if (!userInteractions[newsId]) {
                 userInteractions[newsId] = { viewed: Date.now() };
                 localStorage.setItem('userInteractions', JSON.stringify(userInteractions));
             }
             
-            // Track in backend (async)
             fetch('/api/track', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -452,7 +376,7 @@
                     action: 'view',
                     category: category
                 })
-            }).catch(e => console.error('Tracking error:', e));
+            }).catch(e => console.error(e));
         }
 
         function openNews(url, newsId, category) {
@@ -461,14 +385,10 @@
         }
 
         function markReviewed(newsId, newsUrl, category) {
-            // Update localStorage
-            if (!userInteractions[newsId]) {
-                userInteractions[newsId] = {};
-            }
+            if (!userInteractions[newsId]) userInteractions[newsId] = {};
             userInteractions[newsId].reviewed = !userInteractions[newsId].reviewed;
             localStorage.setItem('userInteractions', JSON.stringify(userInteractions));
             
-            // Track in backend
             if (userInteractions[newsId].reviewed) {
                 fetch('/api/track', {
                     method: 'POST',
@@ -480,15 +400,12 @@
                         category: category,
                         reading_time: 60
                     })
-                }).catch(e => console.error('Tracking error:', e));
+                }).catch(e => console.error(e));
             }
             
-            // Re-render
             filterNews();
         }
 
-        // ============== UI HELPERS ==============
-        
         function showLoading(show) {
             document.getElementById('loading').classList.toggle('hidden', !show);
             document.getElementById('newsFeed').classList.toggle('hidden', show);
@@ -496,23 +413,12 @@
 
         function updateLastUpdateTime(timestamp) {
             if (!timestamp) return;
-            
             const date = new Date(timestamp);
             document.getElementById('lastUpdate').textContent = date.toLocaleTimeString('en-IN', {
                 hour: '2-digit',
                 minute: '2-digit'
             });
         }
-
-        // ============== OFFLINE SUPPORT ==============
-        
-        // Cache news in localStorage for offline reading
-        window.addEventListener('load', () => {
-            if ('serviceWorker' in navigator) {
-                // Optional: Register service worker for offline support
-                // navigator.serviceWorker.register('/sw.js');
-            }
-        });
     </script>
 </body>
 </html>
