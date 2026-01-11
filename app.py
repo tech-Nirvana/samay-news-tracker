@@ -1,7 +1,7 @@
 """
 =============================================================================
-NIRVANA READ - News Curated for You
-A citizen-centric news platform for India
+NIRVANA READ - Enhanced News System
+9 categories, relaxed filtering, 72-hour freshness
 =============================================================================
 """
 
@@ -17,7 +17,7 @@ import re
 import hashlib
 from rss_sources import (
     CURATED_SOURCES, FOCUS_CATEGORIES, get_all_feed_urls,
-    is_relevant_to_citizen, get_exclusion_keywords
+    is_relevant_to_citizen
 )
 from supabase_client import (
     init_supabase, track_interaction, update_news_feedback,
@@ -33,27 +33,22 @@ IST = timezone(timedelta(hours=5, minutes=30))
 # Cache configuration
 NEWS_CACHE = []
 CACHE_TIMESTAMP = None
-CACHE_DURATION = timedelta(hours=12)  # 12 hour cache
+CACHE_DURATION = timedelta(hours=12)
 
-# Performance optimization for Render free tier
-MAX_RSS_BATCH_SIZE = 5  # Process 5 feeds at a time
-MAX_NEWS_PER_FEED = 10  # Max 10 news per feed
-NEWS_FRESHNESS_HOURS = 48  # Only last 48 hours
+# RELAXED SETTINGS for more news
+MAX_RSS_BATCH_SIZE = 5
+MAX_NEWS_PER_FEED = 15  # Increased from 10
+NEWS_FRESHNESS_HOURS = 72  # 3 days instead of 2
+AI_SCORE_THRESHOLD = 40  # Lowered from 55
 
-# Initialize Supabase on startup
+# Initialize Supabase
 init_supabase()
 
 # ============== RSS PARSING ==============
 
 def parse_rss_feed_optimized(feed_url, source_name, language):
-    """
-    Optimized RSS parser for slow networks
-    - Timeout: 10 seconds
-    - Max entries: 10
-    - Compressed fetching
-    """
+    """Optimized RSS parser"""
     try:
-        # Use requests with timeout for better control
         headers = {
             'User-Agent': 'NirvanaRead/1.0',
             'Accept-Encoding': 'gzip, deflate'
@@ -63,7 +58,6 @@ def parse_rss_feed_optimized(feed_url, source_name, language):
         if response.status_code != 200:
             return []
         
-        # Parse with feedparser
         feed = feedparser.parse(response.content)
         items = []
         
@@ -78,7 +72,7 @@ def parse_rss_feed_optimized(feed_url, source_name, language):
                 else:
                     pub_date = datetime.now(timezone.utc)
                 
-                # Check freshness (48 hours)
+                # Check freshness (72 hours)
                 hours_old = (datetime.now(timezone.utc) - pub_date).total_seconds() / 3600
                 if hours_old > NEWS_FRESHNESS_HOURS:
                     continue
@@ -86,16 +80,14 @@ def parse_rss_feed_optimized(feed_url, source_name, language):
                 # Extract content
                 title = entry.get('title', '').strip()
                 description = entry.get('summary', entry.get('description', '')).strip()
-                
-                # Clean HTML tags from description
                 description = re.sub(r'<[^>]+>', '', description)
-                description = description[:300]  # Limit description length
+                description = description[:300]
                 
                 if not title or not description:
                     continue
                 
                 # Quick relevance check
-                is_relevant, matched_category = is_relevant_to_citizen(title, description)
+                is_relevant, matched_category, confidence = is_relevant_to_citizen(title, description)
                 if not is_relevant:
                     continue
                 
@@ -106,65 +98,55 @@ def parse_rss_feed_optimized(feed_url, source_name, language):
                     'publishedAt': pub_date.strftime('%Y-%m-%dT%H:%M:%SZ'),
                     'source': source_name,
                     'language': language,
-                    'matched_category': matched_category
+                    'matched_category': matched_category,
+                    'confidence': confidence
                 }
                 
                 items.append(item)
                 
             except Exception as e:
-                print(f"Error parsing entry from {source_name}: {str(e)}")
                 continue
         
         return items
         
-    except requests.Timeout:
-        print(f"Timeout fetching {feed_url}")
-        return []
     except Exception as e:
         print(f"Error fetching {feed_url}: {str(e)}")
         return []
 
-# ============== AI SCORING ==============
+# ============== AI SCORING (SIMPLIFIED) ==============
 
 def ai_citizen_impact_score(article, category):
-    """
-    AI evaluates: How much does this news impact an average Indian citizen?
-    
-    Scoring criteria:
-    1. Direct impact on daily life (0-100)
-    2. Urgency/timeliness (0-100)
-    3. Actionability (can citizen do something?) (0-100)
-    4. Relevance to average person (0-100)
-    
-    Returns: average score
-    """
+    """AI citizen impact scoring"""
     if not GROQ_API_KEY:
-        # Fallback to rule-based if no AI
-        return 65  # Default medium score
+        # Fallback: Use confidence from keyword matching
+        return {
+            'score': min(50 + int(article.get('confidence', 1) * 10), 85),
+            'reasoning': 'Rule-based scoring (AI unavailable)',
+            'breakdown': {'impact': 65, 'urgency': 65, 'action': 65, 'relevance': 65}
+        }
     
     category_info = FOCUS_CATEGORIES.get(category, {})
     category_name = category_info.get('name_en', category)
     
-    prompt = f"""You are evaluating news for an average Indian citizen.
+    prompt = f"""Evaluate this news for an average Indian citizen.
 
 **Category**: {category_name}
-**News Title**: {article.get('title', '')}
+**Title**: {article.get('title', '')}
 **Description**: {article.get('description', '')[:200]}
 
-**Evaluate on 4 criteria** (0-100 each):
+Rate on 4 criteria (0-100 each):
+1. **Direct Impact**: Daily life effect?
+2. **Urgency**: How soon to know?
+3. **Actionability**: Can citizen act?
+4. **Citizen Relevance**: Relevant to majority?
 
-1. **Direct Impact**: Does this directly affect citizen's daily life? (prices, rights, safety, health, income)
-2. **Urgency**: How soon does citizen need to know? (immediate action needed vs general awareness)
-3. **Actionability**: Can an average citizen take action or benefit from knowing this?
-4. **Citizen Relevance**: Is this relevant to majority of Indians, not just specific groups?
-
-**Respond ONLY with JSON**:
+Respond ONLY with JSON:
 {{
     "direct_impact": 0-100,
     "urgency": 0-100,
     "actionability": 0-100,
     "citizen_relevance": 0-100,
-    "reasoning": "one line explanation"
+    "reasoning": "brief explanation"
 }}"""
 
     try:
@@ -177,7 +159,7 @@ def ai_citizen_impact_score(article, category):
             json={
                 'model': 'llama-3.1-8b-instant',
                 'messages': [
-                    {'role': 'system', 'content': 'You are a news analyst. Respond only with valid JSON.'},
+                    {'role': 'system', 'content': 'Respond only with valid JSON.'},
                     {'role': 'user', 'content': prompt}
                 ],
                 'temperature': 0.3,
@@ -192,8 +174,6 @@ def ai_citizen_impact_score(article, category):
             
             if json_match:
                 ai_result = json.loads(json_match.group())
-                
-                # Calculate average score
                 avg_score = (
                     ai_result.get('direct_impact', 50) +
                     ai_result.get('urgency', 50) +
@@ -213,11 +193,11 @@ def ai_citizen_impact_score(article, category):
                 }
     
     except Exception as e:
-        print(f"AI scoring error: {str(e)}")
+        print(f"AI error: {str(e)}")
     
     # Fallback
     return {
-        'score': 65,
+        'score': min(50 + int(article.get('confidence', 1) * 10), 75),
         'reasoning': 'AI analysis unavailable',
         'breakdown': {'impact': 65, 'urgency': 65, 'action': 65, 'relevance': 65}
     }
@@ -225,21 +205,22 @@ def ai_citizen_impact_score(article, category):
 # ============== MAIN NEWS FETCHING ==============
 
 def fetch_and_score_news():
-    """
-    Fetch news from RSS feeds and score them
-    Optimized for Render free tier and slow networks
-    """
+    """Fetch news from RSS feeds"""
     print(f"🔄 Fetching news at {datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S IST')}")
     
     all_feeds = get_all_feed_urls()
     all_news = []
     processed_urls = set()
     
-    # Process feeds in batches (network optimization)
+    stats = {'fetched': 0, 'filtered': 0, 'ai_processed': 0, 'final': 0}
+    
+    # Process feeds in batches
     for i in range(0, len(all_feeds), MAX_RSS_BATCH_SIZE):
         batch = all_feeds[i:i + MAX_RSS_BATCH_SIZE]
+        batch_num = i//MAX_RSS_BATCH_SIZE + 1
+        total_batches = (len(all_feeds)-1)//MAX_RSS_BATCH_SIZE + 1
         
-        print(f"📡 Processing batch {i//MAX_RSS_BATCH_SIZE + 1}/{(len(all_feeds)-1)//MAX_RSS_BATCH_SIZE + 1}")
+        print(f"📡 Batch {batch_num}/{total_batches}: Processing {len(batch)} feeds")
         
         for feed_info in batch:
             try:
@@ -249,35 +230,40 @@ def fetch_and_score_news():
                     feed_info['language']
                 )
                 
+                stats['fetched'] += len(articles)
+                
                 for article in articles:
-                    # Skip duplicates
                     if article['url'] in processed_urls:
                         continue
                     processed_urls.add(article['url'])
                     
-                    # AI scoring (batch processed for efficiency)
+                    stats['filtered'] += 1
+                    
+                    # AI scoring
                     category = article['matched_category']
                     ai_result = ai_citizen_impact_score(article, category)
                     
-                    # Skip low-scoring news (filter noise)
-                    if ai_result['score'] < 55:
+                    stats['ai_processed'] += 1
+                    
+                    # RELAXED: Accept score >= 40
+                    if ai_result['score'] < AI_SCORE_THRESHOLD:
                         continue
                     
-                    # Get collective intelligence score (if available)
+                    # Calculate final score
                     final_score = calculate_personalized_score(
                         ai_result['score'],
                         article['url'],
                         category
                     )
                     
-                    # Convert timestamp to IST
+                    # Convert to IST
                     pub_date = datetime.strptime(
                         article['publishedAt'],
                         '%Y-%m-%dT%H:%M:%SZ'
                     ).replace(tzinfo=timezone.utc)
                     pub_date_ist = pub_date.astimezone(IST)
                     
-                    # Calculate time ago
+                    # Time ago
                     hours_ago = int((datetime.now(timezone.utc) - pub_date).total_seconds() / 3600)
                     if hours_ago < 1:
                         time_ago = "Just now"
@@ -307,18 +293,20 @@ def fetch_and_score_news():
                     }
                     
                     all_news.append(news_item)
+                    stats['final'] += 1
                     
             except Exception as e:
-                print(f"Error processing feed {feed_info['source_name']}: {str(e)}")
+                print(f"Error processing {feed_info['source_name']}: {str(e)}")
                 continue
     
-    # Sort by score (highest first)
+    # Sort by score
     all_news.sort(key=lambda x: x['score'], reverse=True)
     
-    # Limit to top 100 news (performance optimization)
-    all_news = all_news[:100]
+    # Limit to top 150 (increased from 100)
+    all_news = all_news[:150]
     
-    print(f"✅ Fetched {len(all_news)} news items")
+    print(f"✅ Stats: Fetched={stats['fetched']}, Filtered={stats['filtered']}, "
+          f"AI Processed={stats['ai_processed']}, Final={len(all_news)}")
     
     return all_news
 
@@ -329,13 +317,12 @@ def update_cache():
     NEWS_CACHE = fetch_and_score_news()
     CACHE_TIMESTAMP = datetime.now(IST)
     
-    print(f"💾 Cache updated: {len(NEWS_CACHE)} items at {CACHE_TIMESTAMP.strftime('%H:%M:%S')}")
+    print(f"💾 Cache updated: {len(NEWS_CACHE)} items")
 
 def get_cached_news():
-    """Get news from cache, refresh if needed"""
+    """Get news from cache"""
     global NEWS_CACHE, CACHE_TIMESTAMP
     
-    # Check if cache needs refresh
     if not CACHE_TIMESTAMP or (datetime.now(IST) - CACHE_TIMESTAMP) > CACHE_DURATION:
         print("🔄 Cache expired, refreshing...")
         update_cache()
@@ -346,16 +333,14 @@ def get_cached_news():
 
 @app.route('/')
 def index():
-    """Main page"""
     return render_template('index.html')
 
 @app.route('/api/news')
 def get_news():
-    """Get news API endpoint"""
     try:
         news = get_cached_news()
         
-        # Apply filters if provided
+        # Filters
         category = request.args.get('category')
         language = request.args.get('language')
         search = request.args.get('search', '').lower()
@@ -383,14 +368,10 @@ def get_news():
         
     except Exception as e:
         print(f"Error in /api/news: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/refresh', methods=['POST'])
 def force_refresh():
-    """Manual refresh endpoint"""
     try:
         update_cache()
         return jsonify({
@@ -400,24 +381,18 @@ def force_refresh():
             'timestamp': CACHE_TIMESTAMP.isoformat()
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/track', methods=['POST'])
 def track_user_action():
-    """Track user interaction for learning"""
     try:
         data = request.json
-        
         user_id = data.get('user_id', 'anonymous')
         news_url = data.get('news_url')
-        action = data.get('action')  # 'view', 'read_full', 'mark_reviewed'
+        action = data.get('action')
         category = data.get('category')
         reading_time = data.get('reading_time', 0)
         
-        # Track in Supabase
         track_interaction(user_id, news_url, action, category, reading_time)
         update_news_feedback(news_url, action)
         
@@ -425,14 +400,11 @@ def track_user_action():
             update_category_stats(category, reading_time)
         
         return jsonify({'success': True})
-        
     except Exception as e:
-        print(f"Error tracking: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/export')
 def export_csv():
-    """Export news to CSV"""
     try:
         news = get_cached_news()
         
@@ -461,27 +433,26 @@ def export_csv():
             'Content-Type': 'text/csv; charset=utf-8',
             'Content-Disposition': f'attachment; filename=nirvana-read-{datetime.now(IST).strftime("%Y%m%d")}.csv'
         }
-    
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @app.route('/health')
 def health():
-    """Health check"""
     return jsonify({
         'status': 'healthy',
         'timestamp': datetime.now(IST).isoformat(),
         'cache_size': len(NEWS_CACHE),
         'cache_age_minutes': int((datetime.now(IST) - CACHE_TIMESTAMP).total_seconds() / 60) if CACHE_TIMESTAMP else None,
-        'ai_enabled': bool(GROQ_API_KEY)
+        'ai_enabled': bool(GROQ_API_KEY),
+        'settings': {
+            'freshness_hours': NEWS_FRESHNESS_HOURS,
+            'ai_threshold': AI_SCORE_THRESHOLD,
+            'max_news': 150
+        }
     })
 
-# ============== STARTUP ==============
-
 if __name__ == '__main__':
-    # Initialize cache on startup
     print("🚀 Starting Nirvana Read...")
+    print(f"⚙️ Settings: {NEWS_FRESHNESS_HOURS}h freshness, Score threshold {AI_SCORE_THRESHOLD}+")
     update_cache()
-    
-    # Run server
     app.run(debug=True, host='0.0.0.0', port=5000)
