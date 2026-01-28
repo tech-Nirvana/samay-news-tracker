@@ -2,6 +2,7 @@
 =============================================================================
 NIRVANA READ - Enhanced News System
 9 categories, relaxed filtering, 72-hour freshness
+WITH BACKGROUND THREADING FOR RENDER DEPLOYMENT
 =============================================================================
 """
 
@@ -15,6 +16,8 @@ import os
 import feedparser
 import re
 import hashlib
+import threading
+import time
 from rss_sources import (
     CURATED_SOURCES, FOCUS_CATEGORIES, get_all_feed_urls,
     is_relevant_to_citizen
@@ -34,6 +37,8 @@ IST = timezone(timedelta(hours=5, minutes=30))
 NEWS_CACHE = []
 CACHE_TIMESTAMP = None
 CACHE_DURATION = timedelta(hours=12)
+CACHE_LOCK = threading.Lock()
+CACHE_REFRESHING = False
 
 # RELAXED SETTINGS for more news
 MAX_RSS_BATCH_SIZE = 5
@@ -311,23 +316,55 @@ def fetch_and_score_news():
     return all_news
 
 def update_cache():
-    """Update news cache"""
-    global NEWS_CACHE, CACHE_TIMESTAMP
+    """Update news cache (thread-safe)"""
+    global NEWS_CACHE, CACHE_TIMESTAMP, CACHE_REFRESHING
     
-    NEWS_CACHE = fetch_and_score_news()
-    CACHE_TIMESTAMP = datetime.now(IST)
+    with CACHE_LOCK:
+        if CACHE_REFRESHING:
+            print("⏳ Cache refresh already in progress, skipping...")
+            return
+        CACHE_REFRESHING = True
     
-    print(f"💾 Cache updated: {len(NEWS_CACHE)} items")
+    try:
+        new_cache = fetch_and_score_news()
+        
+        with CACHE_LOCK:
+            NEWS_CACHE = new_cache
+            CACHE_TIMESTAMP = datetime.now(IST)
+            print(f"💾 Cache updated: {len(NEWS_CACHE)} items at {CACHE_TIMESTAMP.strftime('%H:%M:%S')}")
+    
+    except Exception as e:
+        print(f"❌ Cache update failed: {str(e)}")
+    
+    finally:
+        with CACHE_LOCK:
+            CACHE_REFRESHING = False
+
+def background_cache_refresh():
+    """Background thread to refresh cache periodically"""
+    while True:
+        try:
+            with CACHE_LOCK:
+                needs_refresh = (
+                    not CACHE_TIMESTAMP or 
+                    (datetime.now(IST) - CACHE_TIMESTAMP) > CACHE_DURATION
+                )
+            
+            if needs_refresh:
+                print("🔄 Background: Cache expired, refreshing...")
+                update_cache()
+            
+            # Sleep for 30 minutes before checking again
+            time.sleep(1800)
+        
+        except Exception as e:
+            print(f"❌ Background refresh error: {str(e)}")
+            time.sleep(300)  # Sleep 5 min on error
 
 def get_cached_news():
     """Get news from cache"""
-    global NEWS_CACHE, CACHE_TIMESTAMP
-    
-    if not CACHE_TIMESTAMP or (datetime.now(IST) - CACHE_TIMESTAMP) > CACHE_DURATION:
-        print("🔄 Cache expired, refreshing...")
-        update_cache()
-    
-    return NEWS_CACHE
+    with CACHE_LOCK:
+        return NEWS_CACHE.copy()
 
 # ============== FLASK ROUTES ==============
 
@@ -339,6 +376,19 @@ def index():
 def get_news():
     try:
         news = get_cached_news()
+        
+        # If cache is empty, trigger refresh but still respond
+        if not news:
+            print("⚠️ Cache empty, triggering background refresh...")
+            threading.Thread(target=update_cache, daemon=True).start()
+            return jsonify({
+                'success': True,
+                'news': [],
+                'total': 0,
+                'message': 'Loading news... Please refresh in a moment.',
+                'cached_at': None,
+                'timestamp': datetime.now(IST).isoformat()
+            })
         
         # Filters
         category = request.args.get('category')
@@ -373,12 +423,14 @@ def get_news():
 @app.route('/api/refresh', methods=['POST'])
 def force_refresh():
     try:
-        update_cache()
+        # Start refresh in background
+        threading.Thread(target=update_cache, daemon=True).start()
+        
         return jsonify({
             'success': True,
-            'message': 'Cache refreshed',
+            'message': 'Cache refresh started in background',
             'total': len(NEWS_CACHE),
-            'timestamp': CACHE_TIMESTAMP.isoformat()
+            'timestamp': datetime.now(IST).isoformat()
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -438,11 +490,16 @@ def export_csv():
 
 @app.route('/health')
 def health():
+    with CACHE_LOCK:
+        cache_age = int((datetime.now(IST) - CACHE_TIMESTAMP).total_seconds() / 60) if CACHE_TIMESTAMP else None
+        is_refreshing = CACHE_REFRESHING
+    
     return jsonify({
         'status': 'healthy',
         'timestamp': datetime.now(IST).isoformat(),
         'cache_size': len(NEWS_CACHE),
-        'cache_age_minutes': int((datetime.now(IST) - CACHE_TIMESTAMP).total_seconds() / 60) if CACHE_TIMESTAMP else None,
+        'cache_age_minutes': cache_age,
+        'cache_refreshing': is_refreshing,
         'ai_enabled': bool(GROQ_API_KEY),
         'settings': {
             'freshness_hours': NEWS_FRESHNESS_HOURS,
@@ -451,8 +508,26 @@ def health():
         }
     })
 
-if __name__ == '__main__':
+# ============== STARTUP ==============
+
+def initialize_app():
+    """Initialize app - non-blocking startup"""
     print("🚀 Starting Nirvana Read...")
     print(f"⚙️ Settings: {NEWS_FRESHNESS_HOURS}h freshness, Score threshold {AI_SCORE_THRESHOLD}+")
-    update_cache()
+    
+    # Start background refresh thread
+    refresh_thread = threading.Thread(target=background_cache_refresh, daemon=True)
+    refresh_thread.start()
+    print("🔄 Background refresh thread started")
+    
+    # Do initial cache load in background (non-blocking)
+    initial_load = threading.Thread(target=update_cache, daemon=True)
+    initial_load.start()
+    print("📰 Initial news load started in background")
+    print("✅ App ready to serve requests")
+
+# Initialize when module is imported
+initialize_app()
+
+if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
