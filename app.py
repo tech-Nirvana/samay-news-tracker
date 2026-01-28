@@ -121,7 +121,7 @@ def parse_rss_feed_optimized(feed_url, source_name, language):
 # ============== AI SCORING (SIMPLIFIED) ==============
 
 def ai_citizen_impact_score(article, category):
-    """AI citizen impact scoring"""
+    """AI citizen impact scoring with timeout protection"""
     if not GROQ_API_KEY:
         # Fallback: Use confidence from keyword matching
         return {
@@ -170,7 +170,7 @@ Respond ONLY with JSON:
                 'temperature': 0.3,
                 'max_tokens': 200
             },
-            timeout=15
+            timeout=10  # Reduced from 15 to 10
         )
         
         if response.status_code == 200:
@@ -196,28 +196,40 @@ Respond ONLY with JSON:
                         'relevance': ai_result.get('citizen_relevance', 50)
                     }
                 }
+        else:
+            print(f"    AI API error: Status {response.status_code}")
     
+    except requests.Timeout:
+        print(f"    AI timeout for article (using fallback)")
     except Exception as e:
-        print(f"AI error: {str(e)}")
+        print(f"    AI error: {str(e)} (using fallback)")
     
     # Fallback
     return {
         'score': min(50 + int(article.get('confidence', 1) * 10), 75),
-        'reasoning': 'AI analysis unavailable',
+        'reasoning': 'AI analysis unavailable - using rule-based scoring',
         'breakdown': {'impact': 65, 'urgency': 65, 'action': 65, 'relevance': 65}
     }
 
 # ============== MAIN NEWS FETCHING ==============
 
 def fetch_and_score_news():
-    """Fetch news from RSS feeds"""
+    """Fetch news from RSS feeds with detailed error logging"""
     print(f"🔄 Fetching news at {datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S IST')}")
     
-    all_feeds = get_all_feed_urls()
+    try:
+        all_feeds = get_all_feed_urls()
+        print(f"📚 Total feeds to process: {len(all_feeds)}")
+    except Exception as e:
+        print(f"❌ CRITICAL: Failed to get feed URLs: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+        return []
+    
     all_news = []
     processed_urls = set()
     
-    stats = {'fetched': 0, 'filtered': 0, 'ai_processed': 0, 'final': 0}
+    stats = {'fetched': 0, 'filtered': 0, 'ai_processed': 0, 'final': 0, 'errors': 0}
     
     # Process feeds in batches
     for i in range(0, len(all_feeds), MAX_RSS_BATCH_SIZE):
@@ -228,81 +240,95 @@ def fetch_and_score_news():
         print(f"📡 Batch {batch_num}/{total_batches}: Processing {len(batch)} feeds")
         
         for feed_info in batch:
+            feed_name = feed_info.get('source_name', 'Unknown')
             try:
+                print(f"  → Fetching {feed_name}...", end=' ')
+                
                 articles = parse_rss_feed_optimized(
                     feed_info['url'],
                     feed_info['source_name'],
                     feed_info['language']
                 )
                 
+                print(f"Got {len(articles)} articles")
                 stats['fetched'] += len(articles)
                 
                 for article in articles:
-                    if article['url'] in processed_urls:
+                    try:
+                        if article['url'] in processed_urls:
+                            continue
+                        processed_urls.add(article['url'])
+                        
+                        stats['filtered'] += 1
+                        
+                        # AI scoring
+                        category = article['matched_category']
+                        ai_result = ai_citizen_impact_score(article, category)
+                        
+                        stats['ai_processed'] += 1
+                        
+                        # RELAXED: Accept score >= 40
+                        if ai_result['score'] < AI_SCORE_THRESHOLD:
+                            continue
+                        
+                        # Calculate final score
+                        final_score = calculate_personalized_score(
+                            ai_result['score'],
+                            article['url'],
+                            category
+                        )
+                        
+                        # Convert to IST
+                        pub_date = datetime.strptime(
+                            article['publishedAt'],
+                            '%Y-%m-%dT%H:%M:%SZ'
+                        ).replace(tzinfo=timezone.utc)
+                        pub_date_ist = pub_date.astimezone(IST)
+                        
+                        # Time ago
+                        hours_ago = int((datetime.now(timezone.utc) - pub_date).total_seconds() / 3600)
+                        if hours_ago < 1:
+                            time_ago = "Just now"
+                        elif hours_ago < 24:
+                            time_ago = f"{hours_ago}h ago"
+                        else:
+                            days_ago = hours_ago // 24
+                            time_ago = f"{days_ago}d ago"
+                        
+                        news_item = {
+                            'id': hashlib.md5(article['url'].encode()).hexdigest(),
+                            'title': article['title'],
+                            'description': article['description'],
+                            'url': article['url'],
+                            'source': article['source'],
+                            'language': article['language'],
+                            'category': FOCUS_CATEGORIES[category]['name_en'],
+                            'category_hi': FOCUS_CATEGORIES[category]['name_hi'],
+                            'categoryKey': category,
+                            'publishedAt': article['publishedAt'],
+                            'publishedAtIST': pub_date_ist.strftime('%d %b, %I:%M %p'),
+                            'timeAgo': time_ago,
+                            'score': int(final_score),
+                            'aiScore': ai_result['score'],
+                            'reasoning': ai_result['reasoning'],
+                            'breakdown': ai_result['breakdown']
+                        }
+                        
+                        all_news.append(news_item)
+                        stats['final'] += 1
+                    
+                    except Exception as e:
+                        print(f"    ⚠️ Article processing error: {str(e)}")
+                        stats['errors'] += 1
                         continue
-                    processed_urls.add(article['url'])
-                    
-                    stats['filtered'] += 1
-                    
-                    # AI scoring
-                    category = article['matched_category']
-                    ai_result = ai_citizen_impact_score(article, category)
-                    
-                    stats['ai_processed'] += 1
-                    
-                    # RELAXED: Accept score >= 40
-                    if ai_result['score'] < AI_SCORE_THRESHOLD:
-                        continue
-                    
-                    # Calculate final score
-                    final_score = calculate_personalized_score(
-                        ai_result['score'],
-                        article['url'],
-                        category
-                    )
-                    
-                    # Convert to IST
-                    pub_date = datetime.strptime(
-                        article['publishedAt'],
-                        '%Y-%m-%dT%H:%M:%SZ'
-                    ).replace(tzinfo=timezone.utc)
-                    pub_date_ist = pub_date.astimezone(IST)
-                    
-                    # Time ago
-                    hours_ago = int((datetime.now(timezone.utc) - pub_date).total_seconds() / 3600)
-                    if hours_ago < 1:
-                        time_ago = "Just now"
-                    elif hours_ago < 24:
-                        time_ago = f"{hours_ago}h ago"
-                    else:
-                        days_ago = hours_ago // 24
-                        time_ago = f"{days_ago}d ago"
-                    
-                    news_item = {
-                        'id': hashlib.md5(article['url'].encode()).hexdigest(),
-                        'title': article['title'],
-                        'description': article['description'],
-                        'url': article['url'],
-                        'source': article['source'],
-                        'language': article['language'],
-                        'category': FOCUS_CATEGORIES[category]['name_en'],
-                        'category_hi': FOCUS_CATEGORIES[category]['name_hi'],
-                        'categoryKey': category,
-                        'publishedAt': article['publishedAt'],
-                        'publishedAtIST': pub_date_ist.strftime('%d %b, %I:%M %p'),
-                        'timeAgo': time_ago,
-                        'score': int(final_score),
-                        'aiScore': ai_result['score'],
-                        'reasoning': ai_result['reasoning'],
-                        'breakdown': ai_result['breakdown']
-                    }
-                    
-                    all_news.append(news_item)
-                    stats['final'] += 1
                     
             except Exception as e:
-                print(f"Error processing {feed_info['source_name']}: {str(e)}")
+                print(f"Failed!")
+                print(f"  ❌ Error processing {feed_name}: {str(e)}")
+                stats['errors'] += 1
                 continue
+        
+        print(f"  ✓ Batch {batch_num} complete. Running total: {len(all_news)} news items")
     
     # Sort by score
     all_news.sort(key=lambda x: x['score'], reverse=True)
@@ -310,8 +336,8 @@ def fetch_and_score_news():
     # Limit to top 150 (increased from 100)
     all_news = all_news[:150]
     
-    print(f"✅ Stats: Fetched={stats['fetched']}, Filtered={stats['filtered']}, "
-          f"AI Processed={stats['ai_processed']}, Final={len(all_news)}")
+    print(f"✅ FINAL Stats: Fetched={stats['fetched']}, Filtered={stats['filtered']}, "
+          f"AI Processed={stats['ai_processed']}, Final={len(all_news)}, Errors={stats['errors']}")
     
     return all_news
 
@@ -326,19 +352,38 @@ def update_cache():
         CACHE_REFRESHING = True
     
     try:
+        print("=" * 60)
+        print("🔄 STARTING CACHE REFRESH")
+        print("=" * 60)
+        
         new_cache = fetch_and_score_news()
         
-        with CACHE_LOCK:
-            NEWS_CACHE = new_cache
-            CACHE_TIMESTAMP = datetime.now(IST)
-            print(f"💾 Cache updated: {len(NEWS_CACHE)} items at {CACHE_TIMESTAMP.strftime('%H:%M:%S')}")
+        print(f"📊 Fetched {len(new_cache)} news items")
+        
+        if len(new_cache) == 0:
+            print("⚠️ WARNING: No news items fetched! Keeping old cache if exists.")
+            if NEWS_CACHE:
+                print(f"   Current cache has {len(NEWS_CACHE)} items, keeping it.")
+            else:
+                print("   No old cache exists either. Cache remains empty.")
+        else:
+            with CACHE_LOCK:
+                NEWS_CACHE = new_cache
+                CACHE_TIMESTAMP = datetime.now(IST)
+                print(f"✅ Cache updated successfully: {len(NEWS_CACHE)} items at {CACHE_TIMESTAMP.strftime('%H:%M:%S')}")
     
     except Exception as e:
-        print(f"❌ Cache update failed: {str(e)}")
+        print("=" * 60)
+        print(f"❌ CRITICAL ERROR in cache update: {str(e)}")
+        print("=" * 60)
+        import traceback
+        print(traceback.format_exc())
     
     finally:
         with CACHE_LOCK:
             CACHE_REFRESHING = False
+            print("🏁 Cache refresh process completed")
+            print("=" * 60)
 
 def background_cache_refresh():
     """Background thread to refresh cache periodically"""
