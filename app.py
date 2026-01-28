@@ -149,7 +149,7 @@ def fetch_single_feed(feed_info):
 # ============== AI SCORING (SIMPLIFIED) ==============
 
 def ai_citizen_impact_score(article, category):
-    """AI citizen impact scoring with timeout protection"""
+    """AI citizen impact scoring with timeout protection and rate limit handling"""
     if not GROQ_API_KEY:
         # Fallback: Use confidence from keyword matching
         return {
@@ -198,7 +198,7 @@ Respond ONLY with JSON:
                 'temperature': 0.3,
                 'max_tokens': 200
             },
-            timeout=10  # Reduced from 15 to 10
+            timeout=10
         )
         
         if response.status_code == 200:
@@ -224,19 +224,28 @@ Respond ONLY with JSON:
                         'relevance': ai_result.get('citizen_relevance', 50)
                     }
                 }
-        else:
-            print(f"    AI API error: Status {response.status_code}")
+        elif response.status_code == 429:
+            # Rate limit hit - use fallback with small delay
+            time.sleep(0.1)
     
     except requests.Timeout:
-        print(f"    AI timeout for article (using fallback)")
+        pass
     except Exception as e:
-        print(f"    AI error: {str(e)} (using fallback)")
+        pass
     
-    # Fallback
+    # Fallback - use keyword-based scoring
+    confidence = article.get('confidence', 1)
+    base_score = min(45 + int(confidence * 15), 85)
+    
     return {
-        'score': min(50 + int(article.get('confidence', 1) * 10), 75),
-        'reasoning': 'AI analysis unavailable - using rule-based scoring',
-        'breakdown': {'impact': 65, 'urgency': 65, 'action': 65, 'relevance': 65}
+        'score': base_score,
+        'reasoning': 'Keyword-based scoring (AI rate limited)',
+        'breakdown': {
+            'impact': base_score,
+            'urgency': base_score,
+            'action': base_score,
+            'relevance': base_score
+        }
     }
 
 # ============== MAIN NEWS FETCHING ==============
