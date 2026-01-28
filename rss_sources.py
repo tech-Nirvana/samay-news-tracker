@@ -1,59 +1,36 @@
 """
 =============================================================================
-NIRVANA READ - Enhanced Categories & Keywords
-9 categories for comprehensive citizen news coverage
+NIRVANA READ - FIXED RSS Sources (Fast & Working Feeds Only)
 =============================================================================
 """
 
-# ============== TOP 20 CURATED SOURCES ==============
+# ============== VERIFIED WORKING SOURCES ==============
 CURATED_SOURCES = {
-    # ============== ENGLISH SOURCES (12) ==============
-    'the_hindu': {
-        'name': 'The Hindu',
+    # ============== ENGLISH SOURCES ==============
+    'times_of_india': {
+        'name': 'Times of India',
         'language': 'english',
-        'reliability': 10,
+        'reliability': 8,
         'feeds': {
-            'national': 'https://www.thehindu.com/news/national/feeder/default.rss',
-            'cities': 'https://www.thehindu.com/news/cities/feeder/default.rss'
+            'top': 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms'
         },
-        'focus': ['rights', 'social', 'health', 'economic', 'crime']
+        'focus': ['social', 'economic', 'crime']
     },
     'indian_express': {
         'name': 'Indian Express',
         'language': 'english',
         'reliability': 10,
         'feeds': {
-            'india': 'https://indianexpress.com/section/india/feed/',
-            'cities': 'https://indianexpress.com/section/cities/feed/'
+            'india': 'https://indianexpress.com/section/india/feed/'
         },
         'focus': ['rights', 'social', 'economic', 'crime']
-    },
-    'the_wire': {
-        'name': 'The Wire',
-        'language': 'english',
-        'reliability': 9,
-        'feeds': {
-            'rights': 'https://thewire.in/rights/feed',
-            'politics': 'https://thewire.in/politics/feed',
-            'health': 'https://thewire.in/health/feed'
-        },
-        'focus': ['rights', 'social', 'health', 'religion']
-    },
-    'scroll': {
-        'name': 'Scroll.in',
-        'language': 'english',
-        'reliability': 9,
-        'feeds': {
-            'india': 'https://scroll.in/feeds/india.rss'
-        },
-        'focus': ['rights', 'social', 'economic', 'religion']
     },
     'ndtv': {
         'name': 'NDTV',
         'language': 'english',
         'reliability': 8,
         'feeds': {
-            'india': 'https://feeds.feedburner.com/ndtv/India'
+            'india': 'https://feeds.feedburner.com/ndtvnews-top-stories'
         },
         'focus': ['social', 'health', 'economic', 'crime']
     },
@@ -62,8 +39,7 @@ CURATED_SOURCES = {
         'language': 'english',
         'reliability': 8,
         'feeds': {
-            'india': 'https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml',
-            'cities': 'https://www.hindustantimes.com/feeds/rss/cities/rssfeed.xml'
+            'india': 'https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml'
         },
         'focus': ['social', 'health', 'economic', 'crime']
     },
@@ -81,20 +57,9 @@ CURATED_SOURCES = {
         'language': 'english',
         'reliability': 9,
         'feeds': {
-            'politics': 'https://www.livemint.com/rss/politics',
             'news': 'https://www.livemint.com/rss/news'
         },
         'focus': ['economic', 'rights', 'science']
-    },
-    'down_to_earth': {
-        'name': 'Down To Earth',
-        'language': 'english',
-        'reliability': 9,
-        'feeds': {
-            'health': 'https://www.downtoearth.org.in/rss/health',
-            'pollution': 'https://www.downtoearth.org.in/rss/air'
-        },
-        'focus': ['health', 'environment']
     },
     'the_quint': {
         'name': 'The Quint',
@@ -123,8 +88,17 @@ CURATED_SOURCES = {
         },
         'focus': ['social', 'economic', 'rights']
     },
+    'down_to_earth': {
+        'name': 'Down To Earth',
+        'language': 'english',
+        'reliability': 9,
+        'feeds': {
+            'health': 'https://www.downtoearth.org.in/rss/health'
+        },
+        'focus': ['health', 'environment']
+    },
     
-    # ============== HINDI SOURCES (8) ==============
+    # ============== HINDI SOURCES ==============
     'bbc_hindi': {
         'name': 'BBC Hindi',
         'language': 'hindi',
@@ -152,15 +126,6 @@ CURATED_SOURCES = {
         },
         'focus': ['social', 'economic', 'rights', 'crime']
     },
-    'amar_ujala': {
-        'name': 'अमर उजाला',
-        'language': 'hindi',
-        'reliability': 8,
-        'feeds': {
-            'india': 'https://www.amarujala.com/rss/india-news.xml'
-        },
-        'focus': ['social', 'economic', 'crime']
-    },
     'ndtv_hindi': {
         'name': 'NDTV Hindi',
         'language': 'hindi',
@@ -169,33 +134,6 @@ CURATED_SOURCES = {
             'news': 'https://khabar.ndtv.com/rss/india'
         },
         'focus': ['social', 'health', 'economic', 'crime']
-    },
-    'patrika': {
-        'name': 'पत्रिका',
-        'language': 'hindi',
-        'reliability': 7,
-        'feeds': {
-            'india': 'https://www.patrika.com/rss/india-news.xml'
-        },
-        'focus': ['social', 'economic', 'religion']
-    },
-    'jagran_josh': {
-        'name': 'Jagran Josh',
-        'language': 'hindi',
-        'reliability': 7,
-        'feeds': {
-            'current_affairs': 'https://www.jagranjosh.com/rss/current-affairs.xml'
-        },
-        'focus': ['rights', 'social', 'economic', 'education']
-    },
-    'nai_dunia': {
-        'name': 'नई दुनिया',
-        'language': 'hindi',
-        'reliability': 7,
-        'feeds': {
-            'national': 'https://www.naidunia.com/rss/national-news'
-        },
-        'focus': ['social', 'economic', 'religion']
     }
 }
 
